@@ -13,17 +13,22 @@
         android:layout_height="120dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="30dp"
         android:src="@drawable/temp_user" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tap_to_upload_your_image"
+        android:id="@+id/text_uploadImage"
         android:layout_below="@id/img_profile"
         android:layout_centerHorizontal="true"
-        android:layout_margin="15dp"
-        android:textColor="@color/secondary_text"/>
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginBottom="15dp"
+        android:textSize="16sp"
+        android:text="@string/tap_to_upload_your_image"
+        android:textColor="@color/secondary_text" />
 
     <EditText
         android:layout_width="match_parent"
@@ -34,11 +39,13 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="60dp"
         android:padding="10dp"
+        android:textColor="@color/primary_text"
         android:background="@drawable/edit_text_background"
         android:hint="@string/please_enter_your_name"
         android:textColorHint="@color/secondary_text" />
 
     <EditText
+        android:textColor="@color/primary_text"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/edt_name"
@@ -52,6 +59,7 @@
         android:textColorHint="@color/secondary_text" />
 
     <EditText
+        android:textColor="@color/primary_text"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/edt_phoneNumber"
@@ -65,6 +73,7 @@
         android:textColorHint="@color/secondary_text" />
 
     <EditText
+        android:textColor="@color/primary_text"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/edt_email"
@@ -78,6 +87,7 @@
         android:textColorHint="@color/secondary_text" />
 
     <EditText
+        android:textColor="@color/primary_text"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_below="@id/edt_password"
@@ -94,7 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/buttonSignUp"
-        android:text="@string/sign_up"
+        android:text="@string/create_new_account"
         android:layout_below="@id/edt_password_again"
         android:textAllCaps="false"
         android:layout_marginTop="25dp"
@@ -103,14 +113,16 @@
         android:textColor="@color/white"/>
 
     <TextView
+        android:id="@+id/text_switchToLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/switch_to_login"
-        android:id="@+id/text_switchToLogin"
         android:layout_below="@id/buttonSignUp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:textColor="@color/secondary_text"/>
+        android:layout_marginBottom="75dp"
+        android:text="@string/switch_to_login"
+        android:textColor="@color/secondary_text"
+        android:textSize="16sp" />
 
 
 
