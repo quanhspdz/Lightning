@@ -148,6 +148,7 @@ public class SignUpActivity extends AppCompatActivity {
         btnSignup = findViewById(R.id.buttonSignUp);
 
         passenger = new Passenger();
+        progressDialog = new ProgressDialog(this);
     }
 
     @Override
@@ -164,7 +165,6 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void uploadImageAndRegister(Context context, Uri imageUri, Passenger passenger, String password) {
-        ProgressDialog progressDialog = new ProgressDialog(context);
         progressDialog.setMessage("Uploading...");
         progressDialog.show();
 
