@@ -165,7 +165,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void uploadImageAndRegister(Context context, Uri imageUri, Passenger passenger, String password) {
-        progressDialog.setMessage("Uploading...");
+        progressDialog.setMessage("Creating your new account...");
         progressDialog.show();
 
         //get image name & extension
