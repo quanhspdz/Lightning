@@ -128,6 +128,8 @@ public class SignUpActivity extends AppCompatActivity {
                             imageUri,
                             passenger,
                             gPassword);
+
+                    btnSignup.setEnabled(false);
                 }
             }
         });
@@ -235,4 +237,11 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        btnSignup.setEnabled(true);
+    }
 }

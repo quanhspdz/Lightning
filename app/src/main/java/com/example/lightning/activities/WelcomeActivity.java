@@ -27,6 +27,7 @@ public class WelcomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(intent);
+                buttonLogin.setEnabled(false);
             }
         });
 
@@ -35,6 +36,7 @@ public class WelcomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SignUpActivity.class);
                 startActivity(intent);
+                buttonSignup.setEnabled(false);
             }
         });
     }
@@ -42,11 +44,19 @@ public class WelcomeActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        }
+//        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+//            Intent intent = new Intent(WelcomeActivity.this, MainActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//            startActivity(intent);
+//            finish();
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        buttonSignup.setEnabled(true);
+        buttonLogin.setEnabled(true);
     }
 }

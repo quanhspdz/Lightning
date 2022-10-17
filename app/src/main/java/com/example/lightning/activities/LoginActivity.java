@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -25,6 +26,8 @@ public class LoginActivity extends AppCompatActivity {
     TextView txtSwitchToSignUp;
     String gEmail, gPassword;
 
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +43,9 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (checkInput()) {
                     loginUser(gEmail, gPassword);
+                    btnLogin.setEnabled(false);
+                    progressDialog.setMessage("Logging in...");
+                    progressDialog.show();
                 }
             }
         });
@@ -56,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
                             finish();
+                            progressDialog.dismiss();
                         }
                     }
                 })
@@ -63,6 +70,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(LoginActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 });
     }
@@ -94,5 +102,13 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.buttonLogin);
 
         txtSwitchToSignUp = findViewById(R.id.text_switchToSignUp);
+
+        progressDialog = new ProgressDialog(LoginActivity.this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        btnLogin.setEnabled(true);
     }
 }
