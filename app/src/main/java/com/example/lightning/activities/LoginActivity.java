@@ -137,6 +137,7 @@ public class LoginActivity extends AppCompatActivity {
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        passengerEmails = new HashMap<>();
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                             Passenger passenger = dataSnapshot.getValue(Passenger.class);
                             if (passenger != null) {
