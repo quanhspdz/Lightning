@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.example.lightning.R;
 import com.example.lightning.models.Passenger;
+import com.google.android.gms.common.internal.Objects;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -45,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         init();
-        getPassengerEmails();
         listener();
     }
 
@@ -146,12 +146,11 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             }
                         }
-
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
-
+                        Toast.makeText(LoginActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -160,5 +159,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         btnLogin.setEnabled(true);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        getPassengerEmails();
     }
 }
