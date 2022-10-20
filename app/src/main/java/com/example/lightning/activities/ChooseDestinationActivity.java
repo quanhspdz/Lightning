@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
@@ -148,11 +149,11 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             edtDestination.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
             edtDestination.setText(place.getAddress());
 
-            pickUpPos = place.getLatLng();
+            destination = place.getLatLng();
 
             //mark this location to google map
             if (map != null) {
-                markLocation(pickUpPos, 1);
+                markLocation(destination, 1);
             }
         } else if (requestCode == CHOOSE_PICK_UP_REQUEST_CODE && resultCode == RESULT_OK) {
             Place place = Autocomplete.getPlaceFromIntent(data);
@@ -160,16 +161,24 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             edtPickUp.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
             edtPickUp.setText(place.getAddress());
 
-            destination = place.getLatLng();
+            pickUpPos = place.getLatLng();
 
             //mark this location to google map
             if (map != null) {
-                markLocation(destination, 0);
+                markLocation(pickUpPos, 0);
             }
         }
     }
 
     private void direction(LatLng origin, LatLng destination) throws IOException {
+        map.clear();
+        markLocation(origin, 0);
+        markLocation(destination, 1);
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Calculating route...");
+        progressDialog.show();
+
         String strOrigin = origin.latitude + ", " + origin.longitude;
         String strDestination = destination.latitude + ", " + destination.longitude;
 
@@ -184,6 +193,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
+                progressDialog.dismiss();
                 try {
                     String status = response.getString("status");
                     if (status.equals("OK")) {
@@ -215,6 +225,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                             polylineOptions.color(ContextCompat.getColor(getApplicationContext(), R.color.blue));
                             polylineOptions.geodesic(true);
                         }
+
                         assert polylineOptions != null;
                         map.addPolyline(polylineOptions);
                         LatLngBounds bounds = new LatLngBounds.Builder()
@@ -225,13 +236,15 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 30));
                     }
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Toast.makeText(ChooseDestinationActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
             }
         });
         RetryPolicy retryPolicy = new DefaultRetryPolicy(30000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
