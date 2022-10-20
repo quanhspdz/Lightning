@@ -16,4 +16,6 @@
     <string name="your_password">Your password</string>
     <string name="your_password_again">Your password again</string>
     <string name="create_new_account">Create new account</string>
+
+    <string name="MAPS_API_KEY">AIzaSyDkEkLvDZG4MWqlXHlbvZqAZ_BpFHxu-Ts</string>
 </resources>

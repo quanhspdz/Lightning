@@ -4,14 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 
 import com.example.lightning.R;
 
 public class MainActivity extends AppCompatActivity {
 
+    EditText edtSearchPlace;
 
 
     @Override
@@ -20,7 +25,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setStatusBarColor();
+        init();
+        listener();
 
+    }
+
+    private void listener() {
+        edtSearchPlace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ChooseDestinationActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void init() {
+        edtSearchPlace = findViewById(R.id.edtSearch);
     }
 
     private void setStatusBarColor() {

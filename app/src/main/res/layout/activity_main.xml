@@ -48,12 +48,27 @@
 
     </androidx.appcompat.widget.Toolbar>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/toolBar"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/edt_location_background"
+        android:drawableStart="@drawable/ic_search"
+        android:padding="15dp"
+        android:focusableInTouchMode="false"
+        android:hint="Search a place"
+        android:inputType="none"
+        android:textColorHint="@color/secondary_text"
+        android:id="@+id/edtSearch"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="100dp"
-        android:layout_below="@id/toolBar"
+        android:layout_marginTop="50dp"
+        android:layout_below="@id/edtSearch"
         android:orientation="vertical"
         android:weightSum="2">
 
@@ -76,6 +91,7 @@
                     <FrameLayout
                         android:layout_width="70dp"
                         android:layout_height="70dp"
+                        android:id="@+id/buttonMotor"
                         android:background="@drawable/menu_background"
                         android:layout_centerHorizontal="true">
 
@@ -112,6 +128,7 @@
                     <FrameLayout
                         android:layout_width="70dp"
                         android:layout_height="70dp"
+                        android:id="@+id/buttonCar"
                         android:background="@drawable/menu_background"
                         android:layout_centerHorizontal="true">
 
@@ -148,6 +165,7 @@
                     <FrameLayout
                         android:layout_width="70dp"
                         android:layout_height="70dp"
+                        android:id="@+id/buttonHistory"
                         android:background="@drawable/menu_background"
                         android:layout_centerHorizontal="true">
 
@@ -191,6 +209,7 @@
                     <FrameLayout
                         android:layout_width="70dp"
                         android:layout_height="70dp"
+                        android:id="@+id/buttonVoucher"
                         android:background="@drawable/menu_background"
                         android:layout_centerHorizontal="true">
 
@@ -227,6 +246,7 @@
                     <FrameLayout
                         android:layout_width="70dp"
                         android:layout_height="70dp"
+                        android:id="@+id/buttonYourLocation"
                         android:background="@drawable/menu_background"
                         android:layout_centerHorizontal="true">
 
@@ -234,7 +254,7 @@
                             android:layout_width="65dp"
                             android:layout_height="65dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/shipper" />
+                            android:src="@drawable/locations" />
 
                     </FrameLayout>
 
@@ -263,6 +283,7 @@
                     <FrameLayout
                         android:layout_width="70dp"
                         android:layout_height="70dp"
+                        android:id="@+id/buttonSettings"
                         android:background="@drawable/menu_background"
                         android:layout_centerHorizontal="true">
 
@@ -279,7 +300,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_marginBottom="10dp"
-                        android:text="Setting"
+                        android:text="Settings"
                         android:layout_centerHorizontal="true"/>
 
 
