@@ -48,4 +48,5 @@ dependencies {
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.android.libraries.places:places:2.6.0'
+    implementation 'com.google.maps.android:android-maps-utils:2.4.0'
 }
