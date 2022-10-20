@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -56,6 +58,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
     EditText edtPickUp, edtDestination;
     AppCompatButton buttonConfirm;
+    LinearLayout layoutBottom;
+
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
 
@@ -117,8 +121,9 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         edtDestination = findViewById(R.id.edt_dropOfPos);
         edtPickUp = findViewById(R.id.edt_pickUpPos);
         buttonConfirm = findViewById(R.id.buttonConfirm);
+        layoutBottom = findViewById(R.id.layoutBottom);
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.fragment_maps);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id  .fragment_maps);
         mapFragment.getMapAsync(this);
 
         Places.initialize(ChooseDestinationActivity.this, getResources().getString(R.string.MAPS_API_KEY));
@@ -229,11 +234,13 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                         assert polylineOptions != null;
                         map.addPolyline(polylineOptions);
                         LatLngBounds bounds = new LatLngBounds.Builder()
-                                .include(new LatLng(origin.latitude, origin.longitude))
-                                .include(new LatLng(destination.latitude, origin.longitude)).build();
+                                .include(new LatLng(destination.latitude, destination.longitude))
+                                .include(new LatLng(origin.latitude, origin.longitude)).build();
                         Point point = new Point();
                         getWindowManager().getDefaultDisplay().getSize(point);
-                        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 30));
+                        map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
+
+                        layoutBottom.setVisibility(View.VISIBLE);
                     }
                 } catch (JSONException e) {
                     Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
