@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.ChooseDestinationActivity">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true">
+
+        <fragment
+            android:id="@+id/fragment_maps"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_maps"/>
+
+    </FrameLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/layout_choosePlace">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/edt_pickUpPos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/edt_location_background"
+            android:hint=" Your location"
+            android:drawableStart="@drawable/blue_pin"
+            android:textColorHint="@color/secondary_text"
+            android:textColor="@color/primary_text"
+            android:padding="10dp"/>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/edt_pickUpPos"
+            android:id="@+id/edt_dropOfPos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/edt_location_background"
+            android:layout_marginTop="5dp"
+            android:hint=" Choose destination"
+            android:drawableStart="@drawable/red_pin"
+            android:maxLength="50"
+            android:textColorHint="@color/secondary_text"
+            android:textColor="@color/primary_text"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/select_vehicle_background"
+        android:id="@+id/layout_bottom">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:text="Finding your driver..."
+            android:layout_marginTop="15dp"
+            android:textSize="22sp"
+            android:id="@+id/text_finding"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_finding"
+            android:id="@+id/layout_tripInfo">
+
+            <ImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/car"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:id="@+id/imgCar"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20dp"
+                android:layout_toEndOf="@id/imgCar"
+                android:text="Car"
+                android:id="@+id/text_car"
+                android:layout_marginVertical="10dp"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_car"
+                android:text="1 - 3 minutes"
+                android:id="@+id/text_time_car"
+                android:layout_toEndOf="@id/imgCar"
+                android:layout_marginHorizontal="20dp"
+                android:textColor="@color/secondary_text"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:text="30 000đ"
+                android:id="@+id/text_money_car"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="20dp"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

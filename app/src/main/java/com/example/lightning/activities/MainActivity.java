@@ -11,13 +11,14 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import com.example.lightning.R;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText edtSearchPlace;
-
+    FrameLayout btnYourLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +39,19 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        btnYourLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SearchForDriverActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void init() {
         edtSearchPlace = findViewById(R.id.edtSearch);
+        btnYourLocation = findViewById(R.id.buttonYourLocation);
     }
 
     private void setStatusBarColor() {

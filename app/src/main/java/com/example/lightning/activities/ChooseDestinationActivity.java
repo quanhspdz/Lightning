@@ -33,6 +33,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
+import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,6 +45,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -52,6 +56,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -63,6 +69,7 @@ import java.lang.reflect.Array;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
@@ -79,10 +86,16 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
 
+    boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
+    boolean tripIsCreatedOnFirebase = false;
+    Trip trip;
+
     LatLng pickUpPos, destination, UET;
-    String distance, timeCost, moneyCost;
+    String distance, timeCost, moneyCostCar, moneyCostMotor, pickUpName, desName;
 
     GoogleMap map;
+
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,11 +132,41 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (map != null && pickUpPos != null && destination != null) {
+                if (map != null && pickUpPos != null && destination != null && !distanceIsCalculated) {
                     try {
                         direction(pickUpPos, destination);
+                        buttonConfirm.setText("Confirm");
                     } catch (IOException e) {
                         Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                if ((carIsChosen || motorIsChosen) && checkTripData()) {
+                    if (carIsChosen) {
+                        trip = new Trip(
+                                FirebaseAuth.getInstance().getUid(),
+                                pickUpPos.toString(),
+                                destination.toString(),
+                                distance,
+                                moneyCostCar,
+                                timeCost,
+                                Const.car,
+                                Calendar.getInstance().getTime().toString()
+                        );
+                    } else if (motorIsChosen) {
+                        trip = new Trip(
+                                FirebaseAuth.getInstance().getUid(),
+                                pickUpPos.toString(),
+                                destination.toString(),
+                                distance,
+                                moneyCostCar,
+                                timeCost,
+                                Const.motor,
+                                Calendar.getInstance().getTime().toString()
+                        );
+                    }
+                    if (!(tripIsCreatedOnFirebase)) {
+                        createNewTripOnFirebase(trip);
+                        tripIsCreatedOnFirebase = true;
                     }
                 }
             }
@@ -134,6 +177,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             public void onClick(View v) {
                 layoutMotor.setBackgroundColor(getResources().getColor(R.color.selected_blue));
                 layoutCar.setBackgroundColor(getResources().getColor(R.color.white));
+                motorIsChosen = true;
+                carIsChosen = false;
             }
         });
 
@@ -142,8 +187,48 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             public void onClick(View v) {
                 layoutMotor.setBackgroundColor(getResources().getColor(R.color.white));
                 layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                motorIsChosen = false;
+                carIsChosen = true;
             }
         });
+    }
+
+    private void createNewTripOnFirebase(Trip trip) {
+        trip.setStatus(Const.active);
+        trip.setPickUpName(pickUpName);
+        trip.setDropOffName(desName);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Creating your trip...");
+        progressDialog.show();
+
+        String key = FirebaseDatabase.getInstance().getReference().child("Trips")
+                .push().getKey();
+        trip.setId(key);
+        FirebaseDatabase.getInstance().getReference().child("Trips")
+                .child(trip.getId())
+                .setValue(trip)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        progressDialog.dismiss();
+                        Intent intent = new Intent(ChooseDestinationActivity.this, SearchForDriverActivity.class);
+                        intent.putExtra("tripId", trip.getId());
+                        startActivity(intent);
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                        progressDialog.show();
+                    }
+                });
+    }
+
+    private boolean checkTripData() {
+        return !distance.isEmpty() && !moneyCostMotor.isEmpty() && !moneyCostCar.isEmpty()
+                && !timeCost.isEmpty() && pickUpPos != null && destination != null;
     }
 
     private void getAutoCompleteDestination(Integer requestCode, String input) {
@@ -204,7 +289,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             edtDestination.setText(place.getAddress());
 
             destination = place.getLatLng();
-
+            distanceIsCalculated = false;
+            desName = place.getAddress();
             //mark this location to google map
             if (map != null) {
                 markLocation(destination, 1);
@@ -216,7 +302,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             edtPickUp.setText(place.getAddress());
 
             pickUpPos = place.getLatLng();
-
+            distanceIsCalculated = false;
+            pickUpName = place.getAddress();
             //mark this location to google map
             if (map != null) {
                 markLocation(pickUpPos, 0);
@@ -292,6 +379,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
 
                         layoutBottom.setVisibility(View.VISIBLE);
+                        distanceIsCalculated = true;
                     }
                 } catch (JSONException e) {
                     Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
@@ -327,8 +415,10 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         double costMotorDouble = Const.costPerKmMotor * distanceDouble;
 
         NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
-        textCostMotor.setText(String.format("%s", nf.format(costMotorDouble)));
-        textCostCar.setText(String.format("%s", nf.format(costCarDouble)));
+        moneyCostCar = nf.format(costCarDouble);
+        moneyCostMotor = nf.format(costMotorDouble);
+        textCostMotor.setText(moneyCostMotor);
+        textCostCar.setText(moneyCostCar);
     }
 
     private List<LatLng> decodePoly(String encoded){
