@@ -74,6 +74,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     LinearLayout layoutBottom;
     FloatingActionButton btnSearchPickUp, btnSearchDes;
     TextView textTimeMotor, textTimeCar, textCostMotor, textCostCar;
+    RelativeLayout layoutMotor, layoutCar;
 
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
@@ -127,6 +128,22 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 }
             }
         });
+
+        layoutMotor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutMotor.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                layoutCar.setBackgroundColor(getResources().getColor(R.color.white));
+            }
+        });
+
+        layoutCar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutMotor.setBackgroundColor(getResources().getColor(R.color.white));
+                layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+            }
+        });
     }
 
     private void getAutoCompleteDestination(Integer requestCode, String input) {
@@ -152,6 +169,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         textCostMotor = findViewById(R.id.text_money_motor);
         textTimeCar = findViewById(R.id.text_time_car);
         textTimeMotor = findViewById(R.id.text_time_motor);
+        layoutCar = findViewById(R.id.layoutCar);
+        layoutMotor = findViewById(R.id.layoutMotor);
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.fragment_maps);
         mapFragment.getMapAsync(this);
@@ -259,7 +278,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                             }
                             polylineOptions.addAll(points);
                             polylineOptions.width(10);
-                            polylineOptions.color(ContextCompat.getColor(getApplicationContext(), R.color.blue));
+                            polylineOptions.color(ContextCompat.getColor(getApplicationContext(), R.color.green));
                             polylineOptions.geodesic(true);
                         }
 

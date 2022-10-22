@@ -40,4 +40,6 @@
 
     <color name="transparent">#80000000</color>
 
+    <color name="selected_blue">#D1E5F4</color>
+
 </resources>
