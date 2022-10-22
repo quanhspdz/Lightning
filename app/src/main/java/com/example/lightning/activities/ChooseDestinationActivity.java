@@ -1,5 +1,8 @@
 package com.example.lightning.activities;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -11,6 +14,7 @@ import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -28,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -41,7 +46,10 @@ import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -59,11 +67,13 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     EditText edtPickUp, edtDestination;
     AppCompatButton buttonConfirm;
     LinearLayout layoutBottom;
+    FloatingActionButton btnSearchPickUp, btnSearchDes;
 
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
 
     LatLng pickUpPos, destination, UET;
+    String distance, timeCost, moneyCost;
 
     GoogleMap map;
 
@@ -79,17 +89,23 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     }
 
     private void listener() {
-        edtDestination.setOnClickListener(new View.OnClickListener() {
+        btnSearchPickUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getAutoCompleteDestination(CHOOSE_DES_REQUEST_CODE);
+                String input = edtPickUp.getText().toString().trim();
+                if (!(input.isEmpty())) {
+                    getAutoCompleteDestination(CHOOSE_PICK_UP_REQUEST_CODE, input);
+                }
             }
         });
 
-        edtPickUp.setOnClickListener(new View.OnClickListener() {
+        btnSearchDes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getAutoCompleteDestination(CHOOSE_PICK_UP_REQUEST_CODE);
+                String input = edtDestination.getText().toString().trim();
+                if (!(input.isEmpty())) {
+                    getAutoCompleteDestination(CHOOSE_DES_REQUEST_CODE, input);
+                }
             }
         });
 
@@ -107,12 +123,14 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         });
     }
 
-    private void getAutoCompleteDestination(Integer requestCode) {
+    private void getAutoCompleteDestination(Integer requestCode, String input) {
         List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
                 Place.Field.LAT_LNG, Place.Field.NAME);
 
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
-                fieldList).build(ChooseDestinationActivity.this);
+                fieldList)
+                .setInitialQuery(input)
+                .build(ChooseDestinationActivity.this);
 
         startActivityForResult(intent, requestCode);
     }
@@ -122,8 +140,10 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         edtPickUp = findViewById(R.id.edt_pickUpPos);
         buttonConfirm = findViewById(R.id.buttonConfirm);
         layoutBottom = findViewById(R.id.layoutBottom);
+        btnSearchDes = findViewById(R.id.button_search_des);
+        btnSearchPickUp = findViewById(R.id.button_search_pickUp);
 
-        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id  .fragment_maps);
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.fragment_maps);
         mapFragment.getMapAsync(this);
 
         Places.initialize(ChooseDestinationActivity.this, getResources().getString(R.string.MAPS_API_KEY));
@@ -150,7 +170,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
         if (requestCode == CHOOSE_DES_REQUEST_CODE && resultCode == RESULT_OK) {
             Place place = Autocomplete.getPlaceFromIntent(data);
-            int maxLength = 33;
+            int maxLength = 28;
             edtDestination.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
             edtDestination.setText(place.getAddress());
 
@@ -162,7 +182,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             }
         } else if (requestCode == CHOOSE_PICK_UP_REQUEST_CODE && resultCode == RESULT_OK) {
             Place place = Autocomplete.getPlaceFromIntent(data);
-            int maxLength = 33;
+            int maxLength = 28;
             edtPickUp.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
             edtPickUp.setText(place.getAddress());
 
@@ -212,6 +232,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                             polylineOptions = new PolylineOptions();
                             JSONArray legs = routes.getJSONObject(i).getJSONArray("legs");
 
+                            getDistanceAndTimeCost(legs);
+
                             for (int j=0;j<legs.length();j++){
                                 JSONArray steps = legs.getJSONObject(j).getJSONArray("steps");
 
@@ -257,6 +279,16 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         RetryPolicy retryPolicy = new DefaultRetryPolicy(30000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(retryPolicy);
         requestQueue.add(jsonObjectRequest);
+    }
+
+    private void getDistanceAndTimeCost(JSONArray legs) throws JSONException {
+        JSONObject object = legs.getJSONObject(0);
+        JSONObject distanceObj = object.getJSONObject("distance");
+        JSONObject durationObj = object.getJSONObject("duration");
+        distance = distanceObj.getString("text");
+        timeCost = durationObj.getString("text");
+
+        Toast.makeText(this, distance + " " + timeCost, Toast.LENGTH_SHORT).show();
     }
 
     private List<LatLng> decodePoly(String encoded){
