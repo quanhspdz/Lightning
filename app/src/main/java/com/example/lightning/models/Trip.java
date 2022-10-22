@@ -11,11 +11,12 @@ public class Trip {
     private String distance;
     private String cost;
     private String timeCost;
+    private String vehicleType;
     private String paymentMethod;
     private String createTime;
     private String endTime;
 
-    public Trip(String id, String passengerId, String driverId, String pickUpLocation, String dropOffLocation, String distance, String cost, String timeCost, String paymentMethod, String createTime, String endTime) {
+    public Trip(String id, String passengerId, String driverId, String pickUpLocation, String dropOffLocation, String distance, String cost, String timeCost, String vehicleType, String paymentMethod, String createTime, String endTime) {
         this.id = id;
         this.passengerId = passengerId;
         this.driverId = driverId;
@@ -24,9 +25,21 @@ public class Trip {
         this.distance = distance;
         this.cost = cost;
         this.timeCost = timeCost;
+        this.vehicleType = vehicleType;
         this.paymentMethod = paymentMethod;
         this.createTime = createTime;
         this.endTime = endTime;
+    }
+
+    public Trip(String passengerId, String pickUpLocation, String dropOffLocation, String distance, String cost, String timeCost, String vehicleType, String createTime) {
+        this.passengerId = passengerId;
+        this.pickUpLocation = pickUpLocation;
+        this.dropOffLocation = dropOffLocation;
+        this.distance = distance;
+        this.cost = cost;
+        this.timeCost = timeCost;
+        this.vehicleType = vehicleType;
+        this.createTime = createTime;
     }
 
     public Trip() {
@@ -120,6 +133,14 @@ public class Trip {
         this.timeCost = timeCost;
     }
 
+    public String getVehicleType() {
+        return vehicleType;
+    }
+
+    public void setVehicleType(String vehicleType) {
+        this.vehicleType = vehicleType;
+    }
+
     @Override
     public String toString() {
         return "Trip{" +
@@ -131,6 +152,7 @@ public class Trip {
                 ", distance='" + distance + '\'' +
                 ", cost='" + cost + '\'' +
                 ", timeCost='" + timeCost + '\'' +
+                ", vehicleType='" + vehicleType + '\'' +
                 ", paymentMethod='" + paymentMethod + '\'' +
                 ", createTime='" + createTime + '\'' +
                 ", endTime='" + endTime + '\'' +

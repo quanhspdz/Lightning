@@ -21,6 +21,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.DefaultRetryPolicy;
@@ -32,6 +33,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
+import com.example.lightning.tools.Const;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -58,9 +60,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
 
 public class ChooseDestinationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -68,6 +73,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     AppCompatButton buttonConfirm;
     LinearLayout layoutBottom;
     FloatingActionButton btnSearchPickUp, btnSearchDes;
+    TextView textTimeMotor, textTimeCar, textCostMotor, textCostCar;
 
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
@@ -142,6 +148,10 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         layoutBottom = findViewById(R.id.layoutBottom);
         btnSearchDes = findViewById(R.id.button_search_des);
         btnSearchPickUp = findViewById(R.id.button_search_pickUp);
+        textCostCar = findViewById(R.id.text_money_car);
+        textCostMotor = findViewById(R.id.text_money_motor);
+        textTimeCar = findViewById(R.id.text_time_car);
+        textTimeMotor = findViewById(R.id.text_time_motor);
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.fragment_maps);
         mapFragment.getMapAsync(this);
@@ -288,7 +298,18 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         distance = distanceObj.getString("text");
         timeCost = durationObj.getString("text");
 
-        Toast.makeText(this, distance + " " + timeCost, Toast.LENGTH_SHORT).show();
+        textTimeMotor.setText(String.format("%s (%s)", timeCost, distance));
+        textTimeCar.setText(String.format("%s (%s)", timeCost, distance));
+
+        //calculate money cost
+        String[] arrayDistance = distance.split(" ");
+        double distanceDouble = Double.parseDouble(arrayDistance[0]);
+        double costCarDouble = Const.costPerKmCar * distanceDouble;
+        double costMotorDouble = Const.costPerKmMotor * distanceDouble;
+
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+        textCostMotor.setText(String.format("%s", nf.format(costMotorDouble)));
+        textCostCar.setText(String.format("%s", nf.format(costCarDouble)));
     }
 
     private List<LatLng> decodePoly(String encoded){
@@ -311,7 +332,6 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 18));
         }
     }
-
 
     @Override
     public void onMapReady(GoogleMap googleMap) {

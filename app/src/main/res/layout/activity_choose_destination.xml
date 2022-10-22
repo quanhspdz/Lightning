@@ -95,6 +95,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/layoutMotor"
             android:layout_weight="1">
 
             <ImageView
@@ -122,6 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/text_motor"
                 android:text="1 - 3 minutes"
+                android:id="@+id/text_time_motor"
                 android:layout_toEndOf="@id/imgMotor"
                 android:layout_marginHorizontal="20dp"
                 android:textColor="@color/secondary_text"/>
@@ -143,6 +145,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/layoutCar"
             android:layout_weight="1">
 
             <ImageView
@@ -170,6 +173,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/text_car"
                 android:text="1 - 3 minutes"
+                android:id="@+id/text_time_car"
                 android:layout_toEndOf="@id/imgCar"
                 android:layout_marginHorizontal="20dp"
                 android:textColor="@color/secondary_text"/>
