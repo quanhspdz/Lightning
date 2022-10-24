@@ -2,6 +2,7 @@ package com.example.lightning.services;
 
 import static com.example.lightning.activities.SearchForDriverActivity.map;
 import static com.example.lightning.activities.SearchForDriverActivity.markerIconName;
+import static com.example.lightning.activities.SearchForDriverActivity.userIconSize;
 
 import android.Manifest;
 import android.app.Notification;
@@ -17,6 +18,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -150,7 +152,7 @@ public class MyLocationServices extends Service {
             SearchForDriverActivity.currentLocationMarker = map.addMarker(new MarkerOptions()
                     .position(latLng)
                     .title("You are here!")
-                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, 120, 120))));
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
         }

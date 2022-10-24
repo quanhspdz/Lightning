@@ -43,6 +43,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.data.Geometry;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,8 +64,10 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
 
     public static GoogleMap map;
     public static Marker currentLocationMarker;
-    public static String markerIconName = "lightning_circle";
-    public static String driverMarkerIconName = "tire";
+    public static String markerIconName = "your_are_here";
+    public static String driverMarkerIconName = "motor_marker_icon";
+    public static int driverIconSize = 160;
+    public static int userIconSize = 160;
 
     MyLocationServices mLocationService;
     Intent mServiceIntent;
@@ -76,6 +79,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
 
     List<Marker> listDriverMarkers;
     List<CurrentPosition> listNearByDrivers;
+
+
 
     static SearchForDriverActivity instance;
     public static SearchForDriverActivity getInstance() {
@@ -236,7 +241,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                                     .position(latLng)
                                     .title("You are here!")
                                     //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, 120, 120))));
+                                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                         } else {
                             Toast.makeText(SearchForDriverActivity.this, "Map is null", Toast.LENGTH_SHORT).show();
@@ -324,7 +329,11 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                             }
                         }
 
-                        markAllNearbyDriver(listNearByDrivers);
+                        try {
+                            markAllNearbyDriver(listNearByDrivers);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -334,7 +343,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                 });
     }
 
-    private void markAllNearbyDriver(List<CurrentPosition> listNearByDrivers) {
+    private void markAllNearbyDriver(List<CurrentPosition> listNearByDrivers) throws InterruptedException {
         //clear all previous driver marker
         if (listDriverMarkers != null) {
             for (Marker marker : listDriverMarkers) {
@@ -347,10 +356,13 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         if (!(listNearByDrivers.isEmpty())) {
             for (CurrentPosition position : listNearByDrivers) {
                 LatLng latLng = DecodeTool.getLatLngFromString(position.getPosition());
-                listDriverMarkers.add(map.addMarker(new MarkerOptions()
+
+                Marker tempMarker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title("Driver")
-                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(driverMarkerIconName, 120, 120)))));
+                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(driverMarkerIconName, driverIconSize, driverIconSize))));
+
+                listDriverMarkers.add(tempMarker);
             }
         }
     }
