@@ -11,6 +11,9 @@ public class CurrentPosition {
         this.time = time;
     }
 
+    public CurrentPosition() {
+    }
+
     public String getDriverId() {
         return driverId;
     }

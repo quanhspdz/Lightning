@@ -22,9 +22,11 @@ import android.widget.Toast;
 
 import com.example.lightning.R;
 import com.example.lightning.models.CurrentPosition;
+import com.example.lightning.models.Driver;
 import com.example.lightning.models.Trip;
 import com.example.lightning.services.MyLocationServices;
 import com.example.lightning.tools.Const;
+import com.example.lightning.tools.DecodeTool;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -57,18 +59,23 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
 
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 123;
     private static final int ACCESS_COARSE_LOCATION_REQUEST_CODE = 234;
-    MyLocationServices mLocationService;
-    private FusedLocationProviderClient fusedLocationClient;
-    Intent mServiceIntent;
-
     public final int maxLength = 34;
 
-    private String tripId;
-    private Trip trip;
     public static GoogleMap map;
     public static Marker currentLocationMarker;
     public static String markerIconName = "lightning_circle";
+    public static String driverMarkerIconName = "tire";
+
+    MyLocationServices mLocationService;
+    Intent mServiceIntent;
     LatLng UET;
+
+    private String tripId;
+    private Trip trip;
+    private FusedLocationProviderClient fusedLocationClient;
+
+    List<Marker> listDriverMarkers;
+    List<CurrentPosition> listNearByDrivers;
 
     static SearchForDriverActivity instance;
     public static SearchForDriverActivity getInstance() {
@@ -297,5 +304,61 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
         markCurrentLocation();
+        startServiceFunc();
+        getListDriverNearby();
+    }
+
+    private void getListDriverNearby() {
+        //get list of drivers nearby
+        FirebaseDatabase.getInstance().getReference().child("CurrentPosition")
+                .child("Driver")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        listNearByDrivers = new ArrayList<>();
+
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            CurrentPosition currentPosition = dataSnapshot.getValue(CurrentPosition.class);
+                            if (currentPosition != null) {
+                                listNearByDrivers.add(currentPosition);
+                            }
+                        }
+
+                        markAllNearbyDriver(listNearByDrivers);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private void markAllNearbyDriver(List<CurrentPosition> listNearByDrivers) {
+        //clear all previous driver marker
+        if (listDriverMarkers != null) {
+            for (Marker marker : listDriverMarkers) {
+                marker.remove();
+            }
+        }
+
+        listDriverMarkers = new ArrayList<>();
+
+        if (!(listNearByDrivers.isEmpty())) {
+            for (CurrentPosition position : listNearByDrivers) {
+                LatLng latLng = DecodeTool.getLatLngFromString(position.getPosition());
+                listDriverMarkers.add(map.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .title("Driver")
+                        .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(driverMarkerIconName, 120, 120)))));
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        stopServiceFunc();
     }
 }

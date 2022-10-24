@@ -89,7 +89,7 @@ public class MyLocationServices extends Service {
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 Location location =  locationResult.getLastLocation();
                 assert location != null;
-                SearchForDriverActivity.getInstance().updateLocationOnFirebase(location);
+                //SearchForDriverActivity.getInstance().updateLocationOnFirebase(location);
                 updateLocationMarker(location);
             }
         };

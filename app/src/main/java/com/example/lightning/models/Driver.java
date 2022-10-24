@@ -1,4 +1,4 @@
-package com.example.lightningdriver.models;
+package com.example.lightning.models;
 
 public class Driver {
     private String id;
