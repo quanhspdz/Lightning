@@ -3,11 +3,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.lightning">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION"
-        tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
 
     <application
         android:allowBackup="true"
@@ -19,6 +22,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Lightning"
         tools:targetApi="32">
+        <service
+            android:name=".services.MyLocationServices"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <activity
             android:name=".activities.SearchForDriverActivity"
             android:exported="false">
@@ -29,7 +37,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/MAPS_API_KEY" />
+            android:value="@string/MAPS_API_KEY_STATIC" />
 
         <activity
             android:name=".activities.ChooseDestinationActivity"
