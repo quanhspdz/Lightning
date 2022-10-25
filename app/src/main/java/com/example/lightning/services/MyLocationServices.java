@@ -1,5 +1,6 @@
 package com.example.lightning.services;
 
+import static com.example.lightning.activities.SearchForDriverActivity.currentLocationMarker;
 import static com.example.lightning.activities.SearchForDriverActivity.map;
 import static com.example.lightning.activities.SearchForDriverActivity.markerIconName;
 import static com.example.lightning.activities.SearchForDriverActivity.userIconSize;
@@ -36,6 +37,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 
@@ -48,8 +50,7 @@ public class MyLocationServices extends Service {
     FusedLocationProviderClient fusedLocationClient;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
-
-    public static Location lastLocation;
+    LatLng lastLocation;
 
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -147,12 +148,12 @@ public class MyLocationServices extends Service {
     public void updateLocationMarker(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         if (map != null) {
-            SearchForDriverActivity.currentLocationMarker.remove();
-
-            SearchForDriverActivity.currentLocationMarker = map.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .title("You are here!")
-                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
+//            currentLocationMarker.remove();
+//
+//            currentLocationMarker = map.addMarker(new MarkerOptions()
+//                    .position(latLng)
+//                    .title("You are here!")
+//                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
         }

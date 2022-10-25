@@ -10,6 +10,8 @@ import androidx.core.content.ContextCompat;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -85,6 +87,9 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
+    private static final String pickUpMarkerName = "pick_up_marker";
+    private static final String desMarkerName = "des_marker";
+    private static final int markerSize = 120;
 
     boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
     boolean tripIsCreatedOnFirebase = false;
@@ -431,15 +436,21 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             map.addMarker(new MarkerOptions()
                     .position(location)
                     .title("You are here!")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(pickUpMarkerName, markerSize, markerSize))));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 18));
         } else if (type == 1) {
             map.addMarker(new MarkerOptions()
                     .position(location)
                     .title("Your destination")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(desMarkerName, markerSize, markerSize))));
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 18));
         }
+    }
+
+    public Bitmap resizeMapIcons(String iconName, int width, int height) {
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 
     @Override

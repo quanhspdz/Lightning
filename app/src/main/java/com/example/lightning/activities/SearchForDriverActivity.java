@@ -81,8 +81,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     List<CurrentPosition> listNearByDrivers;
 
 
-
     static SearchForDriverActivity instance;
+
     public static SearchForDriverActivity getInstance() {
         return instance;
     }
@@ -120,8 +120,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         textVehicleType = findViewById(R.id.text_vehicleType);
         imgVehicle = findViewById(R.id.imgVehicle);
 
-        edtDes.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
-        edtPickUp.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+        edtDes.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
+        edtPickUp.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
 
         UET = new LatLng(21.038902482537342, 105.78296809797327); //Dai hoc Cong Nghe Lat Lng
 
@@ -134,10 +134,10 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     @Override
     protected void onStart() {
         super.onStart();
-        
+
         Intent intent = getIntent();
         if (intent.getStringExtra("tripId") == null) {
-           getLastedTrip();
+            getLastedTrip();
         } else {
             tripId = intent.getStringExtra("tripId");
             getTripInfo(tripId);
@@ -271,7 +271,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         );
     }
 
-    private void startServiceFunc(){
+    private void startServiceFunc() {
         mLocationService = new MyLocationServices();
         mServiceIntent = new Intent(this, mLocationService.getClass());
         if (!isMyServiceRunning(mLocationService.getClass(), this)) {
@@ -282,7 +282,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         }
     }
 
-    private void stopServiceFunc(){
+    private void stopServiceFunc() {
         mLocationService = new MyLocationServices();
         mServiceIntent = new Intent(this, mLocationService.getClass());
         if (isMyServiceRunning(mLocationService.getClass(), this)) {
@@ -307,8 +307,14 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        map.getUiSettings().setRotateGesturesEnabled(false);
+       
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermission();
+            return;
+        }
+        map.setMyLocationEnabled(true);
 
-        markCurrentLocation();
         startServiceFunc();
         getListDriverNearby();
     }
@@ -360,6 +366,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                 Marker tempMarker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title("Driver")
+                        .anchor(0.5f, 0.5f)
                         .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(driverMarkerIconName, driverIconSize, driverIconSize))));
 
                 listDriverMarkers.add(tempMarker);
