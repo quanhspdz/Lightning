@@ -3,9 +3,12 @@ package com.example.lightning.services;
 import static com.example.lightning.activities.SearchForDriverActivity.currentLocationMarker;
 import static com.example.lightning.activities.SearchForDriverActivity.map;
 import static com.example.lightning.activities.SearchForDriverActivity.markerIconName;
+import static com.example.lightning.activities.SearchForDriverActivity.radarCircle;
 import static com.example.lightning.activities.SearchForDriverActivity.userIconSize;
 
 import android.Manifest;
+import android.animation.IntEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -19,6 +22,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Looper;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,6 +31,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 
+import com.example.lightning.R;
 import com.example.lightning.activities.SearchForDriverActivity;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -35,6 +40,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.SphericalUtil;
@@ -155,7 +161,40 @@ public class MyLocationServices extends Service {
 //                    .title("You are here!")
 //                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
 
+            updateRadarCircle(latLng);
+
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+        }
+    }
+
+    private void updateRadarCircle(LatLng latLng) {
+        if (radarCircle == null) {
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(latLng)   //set center
+                    .radius(100)   //set radius in meters
+                    .strokeColor(Color.TRANSPARENT)
+                    .fillColor(getResources().getColor(R.color.radar_blue))
+                    .strokeWidth(5);
+
+            radarCircle = map.addCircle(circleOptions);
+            ValueAnimator valueAnimator = new ValueAnimator();
+            valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            valueAnimator.setRepeatMode(ValueAnimator.RESTART);
+            valueAnimator.setIntValues(0, 1000);
+            valueAnimator.setDuration(3000);
+            valueAnimator.setEvaluator(new IntEvaluator());
+            valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float animatedFraction = valueAnimator.getAnimatedFraction();
+                    radarCircle.setRadius(animatedFraction * 300);
+                }
+            });
+
+            valueAnimator.start();
+        } else {
+            radarCircle.setCenter(latLng);
         }
     }
 

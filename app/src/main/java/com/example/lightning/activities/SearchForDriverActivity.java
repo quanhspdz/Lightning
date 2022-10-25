@@ -34,6 +34,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -64,6 +65,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
 
     public static GoogleMap map;
     public static Marker currentLocationMarker;
+    public static Circle radarCircle;
     public static String markerIconName = "your_are_here";
     public static String driverMarkerIconName = "motor_marker_icon";
     public static int driverIconSize = 160;

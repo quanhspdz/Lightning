@@ -42,4 +42,6 @@
 
     <color name="selected_blue">#D1E5F4</color>
 
+    <color name="radar_blue">#222B8CF0</color>
+
 </resources>
