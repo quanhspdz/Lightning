@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.animation.IntEvaluator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -12,9 +14,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.view.KeyEvent;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -35,6 +40,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -44,6 +50,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.annotations.Until;
 import com.google.maps.android.data.Geometry;
 
 import java.util.ArrayList;
@@ -68,8 +75,11 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     public static Circle radarCircle;
     public static String markerIconName = "your_are_here";
     public static String driverMarkerIconName = "motor_marker_icon";
+    public static String motorMarker = "motor_marker_icon";
+    public static String carMarker = "taxi_marker";
     public static int driverIconSize = 160;
     public static int userIconSize = 160;
+    public static LatLng currentLatLng;
 
     MyLocationServices mLocationService;
     Intent mServiceIntent;
@@ -236,15 +246,6 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                     public void onSuccess(Location location) {
                         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
                         if (map != null) {
-                            if (currentLocationMarker != null) {
-                                currentLocationMarker.remove();
-                            }
-                            currentLocationMarker = map.addMarker(new MarkerOptions()
-                                    .position(latLng)
-                                    .title("You are here!")
-                                    //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                         } else {
                             Toast.makeText(SearchForDriverActivity.this, "Map is null", Toast.LENGTH_SHORT).show();
                         }
@@ -252,6 +253,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                 });
 
     }
+
 
     public Bitmap resizeMapIcons(String iconName, int width, int height) {
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
@@ -364,11 +366,18 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         if (!(listNearByDrivers.isEmpty())) {
             for (CurrentPosition position : listNearByDrivers) {
                 LatLng latLng = DecodeTool.getLatLngFromString(position.getPosition());
+                float bearing = Float.parseFloat(position.getBearing());
+                if (position.getVehicleType().equals(Const.car)) {
+                    driverMarkerIconName = carMarker;
+                } else {
+                    driverMarkerIconName = motorMarker;
+                }
 
                 Marker tempMarker = map.addMarker(new MarkerOptions()
                         .position(latLng)
                         .title("Driver")
                         .anchor(0.5f, 0.5f)
+                        .rotation(bearing)
                         .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(driverMarkerIconName, driverIconSize, driverIconSize))));
 
                 listDriverMarkers.add(tempMarker);
@@ -376,10 +385,69 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public static void updateRadarCircle(LatLng latLng, int colorId) {
+        if (radarCircle == null) {
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(latLng)   //set center
+                    .radius(100)   //set radius in meters
+                    .strokeColor(Color.TRANSPARENT)
+                    .fillColor(colorId)
+                    .strokeWidth(5);
 
+            ValueAnimator valueAnimator = new ValueAnimator();
+            valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            valueAnimator.setRepeatMode(ValueAnimator.RESTART);
+            valueAnimator.setIntValues(0, 1000);
+            valueAnimator.setDuration(3000);
+            valueAnimator.setEvaluator(new IntEvaluator());
+            valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                    float animatedFraction = valueAnimator.getAnimatedFraction();
+                    if (radarCircle != null)
+                        radarCircle.setRadius(animatedFraction * 300);
+                }
+            });
+
+            valueAnimator.start();
+
+            radarCircle = map.addCircle(circleOptions);
+        } else {
+            radarCircle.setCenter(latLng);
+        }
+    }
+
+    private void radarAnimation() {
+        ValueAnimator valueAnimator = new ValueAnimator();
+        valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        valueAnimator.setRepeatMode(ValueAnimator.RESTART);
+        valueAnimator.setIntValues(0, 1000);
+        valueAnimator.setDuration(3000);
+        valueAnimator.setEvaluator(new IntEvaluator());
+        valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float animatedFraction = valueAnimator.getAnimatedFraction();
+                if (radarCircle != null)
+                    radarCircle.setRadius(animatedFraction * 300);
+            }
+        });
+
+        valueAnimator.start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        radarCircle = null;
         stopServiceFunc();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
 }

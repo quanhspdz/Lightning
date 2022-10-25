@@ -1,5 +1,6 @@
 package com.example.lightning.services;
 
+import static com.example.lightning.activities.SearchForDriverActivity.currentLatLng;
 import static com.example.lightning.activities.SearchForDriverActivity.currentLocationMarker;
 import static com.example.lightning.activities.SearchForDriverActivity.map;
 import static com.example.lightning.activities.SearchForDriverActivity.markerIconName;
@@ -154,49 +155,13 @@ public class MyLocationServices extends Service {
     public void updateLocationMarker(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         if (map != null) {
-//            currentLocationMarker.remove();
-//
-//            currentLocationMarker = map.addMarker(new MarkerOptions()
-//                    .position(latLng)
-//                    .title("You are here!")
-//                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, userIconSize, userIconSize))));
 
-            updateRadarCircle(latLng);
+            SearchForDriverActivity.updateRadarCircle(latLng, getResources().getColor(R.color.radar_blue));
 
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
         }
     }
 
-    private void updateRadarCircle(LatLng latLng) {
-        if (radarCircle == null) {
-            CircleOptions circleOptions = new CircleOptions()
-                    .center(latLng)   //set center
-                    .radius(100)   //set radius in meters
-                    .strokeColor(Color.TRANSPARENT)
-                    .fillColor(getResources().getColor(R.color.radar_blue))
-                    .strokeWidth(5);
-
-            radarCircle = map.addCircle(circleOptions);
-            ValueAnimator valueAnimator = new ValueAnimator();
-            valueAnimator.setRepeatCount(ValueAnimator.INFINITE);
-            valueAnimator.setRepeatMode(ValueAnimator.RESTART);
-            valueAnimator.setIntValues(0, 1000);
-            valueAnimator.setDuration(3000);
-            valueAnimator.setEvaluator(new IntEvaluator());
-            valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    float animatedFraction = valueAnimator.getAnimatedFraction();
-                    radarCircle.setRadius(animatedFraction * 300);
-                }
-            });
-
-            valueAnimator.start();
-        } else {
-            radarCircle.setCenter(latLng);
-        }
-    }
 
     public Bitmap resizeMapIcons(String iconName, int width, int height) {
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
