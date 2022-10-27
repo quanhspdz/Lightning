@@ -59,7 +59,10 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
 
 import org.json.JSONArray;
@@ -91,6 +94,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     private static final String desMarkerName = "des_marker";
     private static final int markerSize = 120;
 
+    public static String MAPS_API_KEY;
+
     boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
     boolean tripIsCreatedOnFirebase = false;
     Trip trip;
@@ -107,10 +112,28 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_destination);
 
+        loadCurrentApiKey();
         init();
         setStatusBarColor();
         listener();
 
+    }
+
+    private void loadCurrentApiKey() {
+        FirebaseDatabase.getInstance().getReference().child("Current-API-KEY")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        MAPS_API_KEY = snapshot.getValue(String.class);
+                        assert MAPS_API_KEY != null;
+                        Places.initialize(ChooseDestinationActivity.this, MAPS_API_KEY);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     private void listener() {
@@ -265,8 +288,6 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.fragment_maps);
         mapFragment.getMapAsync(this);
 
-        Places.initialize(ChooseDestinationActivity.this, getResources().getString(R.string.MAPS_API_KEY));
-
         UET = new LatLng(21.038902482537342, 105.78296809797327); //Dai hoc Cong Nghe Lat Lng
     }
 
@@ -334,7 +355,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 .appendQueryParameter("destination", strDestination)
                 .appendQueryParameter("origin", strOrigin)
                 .appendQueryParameter("mode", "driving")
-                .appendQueryParameter("key", getResources().getString(R.string.MAPS_API_KEY))
+                .appendQueryParameter("key", MAPS_API_KEY)
                 .toString();
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
