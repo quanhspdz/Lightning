@@ -99,6 +99,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         return instance;
     }
 
+    boolean statusIsUpdated = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -189,8 +191,9 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         trip = snapshot.getValue(Trip.class);
-                        if (trip != null) {
+                        if (trip != null && !statusIsUpdated) {
                             updateTripStatus(Const.searching, trip);
+                            statusIsUpdated = true;
                         }
                         setTripInfo();
                     }
@@ -203,10 +206,6 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     }
 
     private void updateTripStatus(String status, Trip trip) {
-        FirebaseDatabase.getInstance().getReference().child("Activities").child("Trips")
-                .child(status)
-                .setValue(tripId);
-
         trip.setStatus(status);
         FirebaseDatabase.getInstance().getReference().child("Trips")
                 .child(trip.getId())

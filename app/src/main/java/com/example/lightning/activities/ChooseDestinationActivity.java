@@ -186,7 +186,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                                 pickUpPos.toString(),
                                 destination.toString(),
                                 distance,
-                                moneyCostCar,
+                                moneyCostMotor,
                                 timeCost,
                                 Const.motor,
                                 Calendar.getInstance().getTime().toString()
