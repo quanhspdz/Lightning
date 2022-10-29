@@ -91,7 +91,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
     private static final String pickUpMarkerName = "pick_up_marker";
-    private static final String desMarkerName = "des_marker";
+    private static final String desMarkerName = "flag";
     private static final int markerSize = 120;
 
     public static String MAPS_API_KEY;
