@@ -5,6 +5,7 @@ import static com.example.lightning.activities.SearchForDriverActivity.currentLo
 import static com.example.lightning.activities.SearchForDriverActivity.map;
 import static com.example.lightning.activities.SearchForDriverActivity.markerIconName;
 import static com.example.lightning.activities.SearchForDriverActivity.radarCircle;
+import static com.example.lightning.activities.SearchForDriverActivity.trip;
 import static com.example.lightning.activities.SearchForDriverActivity.userIconSize;
 
 import android.Manifest;
@@ -34,6 +35,9 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.lightning.R;
 import com.example.lightning.activities.SearchForDriverActivity;
+import com.example.lightning.activities.WaitingPickUp;
+import com.example.lightning.models.Trip;
+import com.example.lightning.tools.Const;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -44,6 +48,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
@@ -58,6 +67,10 @@ public class MyLocationServices extends Service {
     LocationRequest locationRequest;
     LocationCallback locationCallback;
     LatLng lastLocation;
+
+    String notificationChannelId = "Location channel 1";
+    String channelName = "Background Service";
+    int notificationId = 2;
 
     private void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -104,14 +117,12 @@ public class MyLocationServices extends Service {
             }
         };
         startLocationUpdates();
+        checkingDriverFound();
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createNotificationChanel() {
-        String notificationChannelId = "Location channel id";
-        String channelName = "Background Service";
-
         NotificationChannel chan = new NotificationChannel(
                 notificationChannelId,
                 channelName,
@@ -167,5 +178,51 @@ public class MyLocationServices extends Service {
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
         return resizedBitmap;
+    }
+
+    public void checkingDriverFound() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (trip == null) {
+
+                }
+                FirebaseDatabase.getInstance().getReference().child("Trips")
+                        .child(trip.getId())
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                Trip trip = snapshot.getValue(Trip.class);
+                                if (trip != null) {
+                                    if (trip.getStatus().equals(Const.waitingPickUp) && trip.getDriverId() != null) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                            pushNewNotification("Found your driver!", trip.getDriverId());
+                                        }
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+            }
+        }).start();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    public void pushNewNotification(String title, String message) {
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(this, notificationChannelId);
+
+        Notification notification = notificationBuilder.setOngoing(true)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .setSmallIcon(R.drawable.lightning_circle)
+                .build();
+        startForeground(notificationId, notification);
     }
 }

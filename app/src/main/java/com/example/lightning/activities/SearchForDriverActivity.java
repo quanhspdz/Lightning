@@ -86,7 +86,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     LatLng UET;
 
     private String tripId;
-    private Trip trip;
+    public static Trip trip;
     private FusedLocationProviderClient fusedLocationClient;
 
     List<Marker> listDriverMarkers;
@@ -174,6 +174,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                         if (listTrips.size() > 0) {
                             trip = listTrips.get(listTrips.size() - 1);
                             setTripInfo();
+                            checkDriverFound();
                         }
                     }
 
@@ -437,11 +438,42 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         valueAnimator.start();
     }
 
+    private void checkDriverFound() {
+        FirebaseDatabase.getInstance().getReference().child("Trips")
+                .child(trip.getId())
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Trip trip = snapshot.getValue(Trip.class);
+                        if (trip != null) {
+                            if (trip.getStatus().equals(Const.waitingPickUp) && trip.getDriverId() != null) {
+                                Intent intent = new Intent(SearchForDriverActivity.getInstance(), WaitingPickUp.class);
+                                intent.putExtra("tripId", trip.getId());
+                                intent.putExtra("driverId", trip.getDriverId());
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         radarCircle = null;
-        stopServiceFunc();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+       // stopServiceFunc();
     }
 
     @Override
