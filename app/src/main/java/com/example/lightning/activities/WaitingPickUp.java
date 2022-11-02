@@ -89,6 +89,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             currentPosition = snapshot.getValue(CurrentPosition.class);
                             if (currentPosition != null) {
+                                setStatusView();
                             }
                         }
 
@@ -299,6 +300,5 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         maps.setMyLocationEnabled(true);
         markCurrentLocation();
         getDataFromFirebase();
-        setStatusView();
     }
 }
