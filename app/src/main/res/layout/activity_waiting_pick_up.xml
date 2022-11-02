@@ -77,9 +77,9 @@
                 android:layout_marginBottom="5dp"
                 android:layout_toEndOf="@id/text_coming"
                 android:background="@drawable/button_background_ghost_white"
-                android:text="6 min"
+                android:text="N/A"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -93,10 +93,10 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_toEndOf="@id/text_timeLeft"
-                android:text="1.5 km"
+                android:text="N/A"
                 android:background="@drawable/button_background_ghost_white"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
             
 
