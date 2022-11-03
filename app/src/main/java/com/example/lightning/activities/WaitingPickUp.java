@@ -8,6 +8,8 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.example.lightning.models.CurrentPosition;
 import com.example.lightning.models.Driver;
 import com.example.lightning.models.Trip;
 import com.example.lightning.models.Vehicle;
+import com.example.lightning.tools.Const;
 import com.example.lightning.tools.DecodeTool;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -29,7 +32,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -58,6 +64,18 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     public static CurrentPosition currentPosition;
     public static Vehicle vehicle;
 
+    public static String markerIconName = "motor_marker_icon";
+    public static final String taxiMarker = "taxi_marker";
+    public static final String motorMarker = "motor_marker_icon";
+    private static final String pickUpMarkerName = "pick_up_marker";
+    private static final String desMarkerName = "flag";
+    public static int driverMarkerSize = 160;
+    public static int locationMarkerSize = 120;
+    public static int zoomToDriver = 17;
+    public static float polyWidth = 14;
+
+    public static Marker driverMarker;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +84,49 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         init();
         hideInfo();
         listener();
+    }
+
+    private void updateDriverLocation(CurrentPosition currentPosition) {
+        LatLng latLng = DecodeTool.getLatLngFromString(currentPosition.getPosition());
+
+        if (driverMarker == null) {
+            driverMarker = maps.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .title("Driver")
+                    .anchor(0.5f, 0.5f)
+                    .rotation(Float.parseFloat(currentPosition.getBearing()))
+                    .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, driverMarkerSize, driverMarkerSize))));
+        } else {
+            driverMarker.setPosition(latLng);
+            driverMarker.setRotation(Float.parseFloat(currentPosition.getBearing()));
+        }
+        maps.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomToDriver));
+    }
+
+    private void markPickUpAndDropOff(Trip trip) {
+        LatLng pickup = DecodeTool.getLatLngFromString(trip.getPickUpLocation());
+        LatLng dropOff = DecodeTool.getLatLngFromString(trip.getDropOffLocation());
+
+        maps.addMarker(new MarkerOptions()
+                .position(pickup)
+                .title("Pick-up")
+                .anchor(0.5f, 0.5f)
+                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(pickUpMarkerName, locationMarkerSize, locationMarkerSize))));
+
+        maps.moveCamera(CameraUpdateFactory.newLatLngZoom(pickup, zoomToDriver));
+
+        maps.addMarker(new MarkerOptions()
+                .position(dropOff)
+                .title("Drop-off")
+                .anchor(0.5f, 0.5f)
+                .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(desMarkerName, locationMarkerSize, locationMarkerSize))));
+
+    }
+
+    public Bitmap resizeMapIcons(String iconName, int width, int height) {
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
+        return resizedBitmap;
     }
 
     private void getDataFromFirebase() {
@@ -90,6 +151,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                             currentPosition = snapshot.getValue(CurrentPosition.class);
                             if (currentPosition != null) {
                                 setStatusView();
+                                updateDriverLocation(currentPosition);
                             }
                         }
 
@@ -215,6 +277,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                             trip = snapshot.getValue(Trip.class);
                             if (trip != null) {
                                 setTripInfoView(trip);
+                                markPickUpAndDropOff(trip);
+                                setVehicleIcon(trip);
                             }
                         }
 
@@ -223,6 +287,14 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
                         }
                     });
+        }
+    }
+
+    private void setVehicleIcon(Trip trip) {
+        if (trip.getVehicleType().equals(Const.car)) {
+            markerIconName = taxiMarker;
+        } else {
+            markerIconName = motorMarker;
         }
     }
 
