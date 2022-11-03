@@ -77,6 +77,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     CircleImageView imgFocus, imgDriver;
     RelativeLayout btnCall, btnMessage;
     AppCompatButton btnCancel;
+    CircleImageView buttonFocus;
 
     boolean infoIsHided = true;
 
@@ -104,6 +105,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     boolean polylineIsDrawn = false;
     boolean keyIsLoaded = false;
+    boolean focusOnDriver = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +116,27 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         loadCurrentApiKey();
         hideInfo();
         listener();
+    }
+
+    public void zoomToDriver() {
+        if (currentPosition != null) {
+            maps.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                    DecodeTool.getLatLngFromString(currentPosition.getPosition())
+                    , zoomToDriver));
+        }
+    }
+
+    public void zoomToPickUpRoute() {
+        LatLng destination = DecodeTool.getLatLngFromString(trip.getPickUpLocation());
+        LatLng origin = DecodeTool.getLatLngFromString(currentPosition.getPosition());
+
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(destination)
+                .include(origin).build();
+        Point point = new Point();
+        getWindowManager().getDefaultDisplay().getSize(point);
+
+        maps.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
     }
 
     private void updateDriverLocation(CurrentPosition currentPosition) {
@@ -128,7 +151,10 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 .anchor(0.5f, 0.5f)
                 .rotation(Float.parseFloat(currentPosition.getBearing()))
                 .icon(BitmapDescriptorFactory.fromBitmap(resizeMapIcons(markerIconName, driverMarkerSize, driverMarkerSize))));
-        maps.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomToDriver));
+
+        if (focusOnDriver) {
+            maps.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoomToDriver));
+        }
     }
 
     private void markPickUpAndDropOff(Trip trip) {
@@ -348,6 +374,21 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 hideInfo();
             }
         });
+
+        buttonFocus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (focusOnDriver) {
+                    focusOnDriver = false;
+                    zoomToPickUpRoute();
+                    buttonFocus.setImageResource(R.drawable.unfocus);
+                } else {
+                    focusOnDriver = true;
+                    zoomToDriver();
+                    buttonFocus.setImageResource(R.drawable.focus);
+                }
+            }
+        });
     }
 
     private void hideInfo() {
@@ -373,6 +414,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         btnCancel = findViewById(R.id.buttonCancel);
         imgFocus = findViewById(R.id.img_focusOnMe);
         imgDriver = findViewById(R.id.img_driver);
+        buttonFocus = findViewById(R.id.img_focusOnMe);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
