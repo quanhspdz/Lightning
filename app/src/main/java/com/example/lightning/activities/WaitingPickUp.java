@@ -273,6 +273,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         distance[0] = Math.round(distance[0] * 10);
                         distance[0] /= 10;
                         textDistanceLeft.setText(String.format("%s km", distance[0]));
+
                     }});
 
             }
@@ -508,7 +509,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         Point point = new Point();
                         getWindowManager().getDefaultDisplay().getSize(point);
 
-                        maps.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
+//                        maps.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
+                    zoomToDriver();
                 } catch (JSONException e) {
                     Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
