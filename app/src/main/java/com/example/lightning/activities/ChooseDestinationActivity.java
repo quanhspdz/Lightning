@@ -37,6 +37,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
 import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
+import com.example.lightning.tools.Goong;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -156,7 +157,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             public void onClick(View v) {
                 String input = edtPickUp.getText().toString().trim();
                 if (!(input.isEmpty())) {
-                    getAutoCompleteDestination(CHOOSE_PICK_UP_REQUEST_CODE, input);
+//                    getAutoCompleteDestination(CHOOSE_PICK_UP_REQUEST_CODE, input);
+                    Goong.searchPlace(getApplicationContext(), input, GOONG_API_KEY);
                 }
             }
         });
