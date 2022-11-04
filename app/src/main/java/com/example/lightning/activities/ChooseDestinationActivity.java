@@ -95,6 +95,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     private static final int markerSize = 120;
 
     public static String MAPS_API_KEY;
+    public static String GOONG_API_KEY;
 
     boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
     boolean tripIsCreatedOnFirebase = false;
@@ -127,6 +128,19 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                         MAPS_API_KEY = snapshot.getValue(String.class);
                         assert MAPS_API_KEY != null;
                         Places.initialize(ChooseDestinationActivity.this, MAPS_API_KEY);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+        FirebaseDatabase.getInstance().getReference().child("GOONG_API_KEY")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        GOONG_API_KEY = snapshot.getValue(String.class);
                     }
 
                     @Override
@@ -350,20 +364,19 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         String strDestination = destination.latitude + ", " + destination.longitude;
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String url = Uri.parse("https://maps.googleapis.com/maps/api/directions/json")
+        String url = Uri.parse("https://rsapi.goong.io/Direction")
                 .buildUpon()
-                .appendQueryParameter("destination", strDestination)
                 .appendQueryParameter("origin", strOrigin)
-                .appendQueryParameter("mode", "driving")
-                .appendQueryParameter("key", MAPS_API_KEY)
+                .appendQueryParameter("destination", strDestination)
+                .appendQueryParameter("vehicle", "bike")
+                .appendQueryParameter("api_key", GOONG_API_KEY)
                 .toString();
+
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 progressDialog.dismiss();
                 try {
-                    String status = response.getString("status");
-                    if (status.equals("OK")) {
                         JSONArray routes = response.getJSONArray("routes");
 
                         ArrayList<LatLng> points;
@@ -406,7 +419,6 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
                         layoutBottom.setVisibility(View.VISIBLE);
                         distanceIsCalculated = true;
-                    }
                 } catch (JSONException e) {
                     Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
