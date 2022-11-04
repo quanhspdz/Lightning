@@ -7,8 +7,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Fragment;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,6 +25,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,9 +40,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
+import com.example.lightning.adapters.PlaceAdapter;
 import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
 import com.example.lightning.tools.Goong;
+import com.example.lightning.tools.Tool;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -109,6 +116,12 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
     ProgressDialog progressDialog;
 
+    public static RecyclerView recyclerViewPickUp, recyclerViewDropOff;
+    public static PlaceAdapter pickUpAdapter, dropOffAdapter;
+    public static List<com.example.lightning.models.Place> pickUpPlaces, dropOffPlaces;
+
+    boolean gotListPlaces = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,7 +171,11 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 String input = edtPickUp.getText().toString().trim();
                 if (!(input.isEmpty())) {
 //                    getAutoCompleteDestination(CHOOSE_PICK_UP_REQUEST_CODE, input);
-                    Goong.searchPlace(getApplicationContext(), input, GOONG_API_KEY);
+                    recyclerViewPickUp.setVisibility(View.VISIBLE);
+                    recyclerViewDropOff.setVisibility(View.GONE);
+                    Goong.searchPlace(getApplicationContext(), input, GOONG_API_KEY, pickUpPlaces, pickUpAdapter);
+                    Tool.hideSoftKeyboard(ChooseDestinationActivity.this);
+                    gotListPlaces = true;
                 }
             }
         });
@@ -168,7 +185,12 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             public void onClick(View v) {
                 String input = edtDestination.getText().toString().trim();
                 if (!(input.isEmpty())) {
-                    getAutoCompleteDestination(CHOOSE_DES_REQUEST_CODE, input);
+//                    getAutoCompleteDestination(CHOOSE_DES_REQUEST_CODE, input);
+                    recyclerViewPickUp.setVisibility(View.GONE);
+                    recyclerViewDropOff.setVisibility(View.VISIBLE);
+                    Goong.searchPlace(getApplicationContext(), input, GOONG_API_KEY, dropOffPlaces, dropOffAdapter);
+                    Tool.hideSoftKeyboard(ChooseDestinationActivity.this);
+                    gotListPlaces = true;
                 }
             }
         });
@@ -233,6 +255,28 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
                 motorIsChosen = false;
                 carIsChosen = true;
+            }
+        });
+
+        edtPickUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (gotListPlaces) {
+                    recyclerViewDropOff.setVisibility(View.GONE);
+                    recyclerViewPickUp.setVisibility(View.GONE);
+                    gotListPlaces = false;
+                }
+            }
+        });
+
+        edtDestination.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (gotListPlaces) {
+                    recyclerViewDropOff.setVisibility(View.GONE);
+                    recyclerViewPickUp.setVisibility(View.GONE);
+                    gotListPlaces = false;
+                }
             }
         });
     }
@@ -300,6 +344,24 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         textTimeMotor = findViewById(R.id.text_time_motor);
         layoutCar = findViewById(R.id.layoutCar);
         layoutMotor = findViewById(R.id.layoutMotor);
+
+        recyclerViewPickUp = findViewById(R.id.recyclerView_pickUp);
+        recyclerViewDropOff = findViewById(R.id.recyclerView_dropOff);
+
+        pickUpPlaces = new ArrayList<>();
+        dropOffPlaces = new ArrayList<>();
+
+        pickUpAdapter = new PlaceAdapter(pickUpPlaces, getApplicationContext());
+        dropOffAdapter = new PlaceAdapter(dropOffPlaces, getApplicationContext());
+
+        recyclerViewPickUp.setHasFixedSize(true);
+        recyclerViewDropOff.setHasFixedSize(true);
+
+        recyclerViewPickUp.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        recyclerViewDropOff.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+
+        recyclerViewPickUp.setAdapter(pickUpAdapter);
+        recyclerViewDropOff.setAdapter(dropOffAdapter);
 
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.fragment_maps);
         mapFragment.getMapAsync(this);
@@ -502,4 +564,5 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
             markLocation(destination, 1);
         }
     }
+
 }

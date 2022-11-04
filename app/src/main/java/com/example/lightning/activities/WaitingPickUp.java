@@ -1,7 +1,5 @@
 package com.example.lightning.activities;
 
-import static com.example.lightning.activities.ChooseDestinationActivity.GOONG_API_KEY;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -19,8 +17,6 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +35,7 @@ import com.example.lightning.models.Driver;
 import com.example.lightning.models.Trip;
 import com.example.lightning.models.Vehicle;
 import com.example.lightning.tools.Const;
-import com.example.lightning.tools.DecodeTool;
+import com.example.lightning.tools.Tool;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -124,14 +120,14 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     public void zoomToDriver() {
         if (currentPosition != null) {
             maps.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                    DecodeTool.getLatLngFromString(currentPosition.getPosition())
+                    Tool.getLatLngFromString(currentPosition.getPosition())
                     , zoomToDriver));
         }
     }
 
     public void zoomToPickUpRoute() {
-        LatLng destination = DecodeTool.getLatLngFromString(trip.getPickUpLocation());
-        LatLng origin = DecodeTool.getLatLngFromString(currentPosition.getPosition());
+        LatLng destination = Tool.getLatLngFromString(trip.getPickUpLocation());
+        LatLng origin = Tool.getLatLngFromString(currentPosition.getPosition());
 
         LatLngBounds bounds = new LatLngBounds.Builder()
                 .include(destination)
@@ -143,7 +139,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void updateDriverLocation(CurrentPosition currentPosition) {
-        LatLng latLng = DecodeTool.getLatLngFromString(currentPosition.getPosition());
+        LatLng latLng = Tool.getLatLngFromString(currentPosition.getPosition());
 
         if (driverMarker != null) {
             driverMarker.remove();
@@ -161,8 +157,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void markPickUpAndDropOff(Trip trip) {
-        LatLng pickup = DecodeTool.getLatLngFromString(trip.getPickUpLocation());
-        LatLng dropOff = DecodeTool.getLatLngFromString(trip.getDropOffLocation());
+        LatLng pickup = Tool.getLatLngFromString(trip.getPickUpLocation());
+        LatLng dropOff = Tool.getLatLngFromString(trip.getDropOffLocation());
 
         maps.addMarker(new MarkerOptions()
                 .position(pickup)
@@ -213,8 +209,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                                 //draw a polyline between driver and pick-up point
                                 if (trip != null && !polylineIsDrawn) {
                                     polylineIsDrawn = true;
-                                    LatLng origin = DecodeTool.getLatLngFromString(currentPosition.getPosition());
-                                    LatLng des = DecodeTool.getLatLngFromString(trip.getPickUpLocation());
+                                    LatLng origin = Tool.getLatLngFromString(currentPosition.getPosition());
+                                    LatLng des = Tool.getLatLngFromString(trip.getPickUpLocation());
                                     try {
                                         direction(origin, des);
                                     } catch (IOException e) {
@@ -251,9 +247,9 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
                 }
 
-                final float[] distance = {(float) DecodeTool.calculateDistance(
-                        DecodeTool.getLatLngFromString(trip.getPickUpLocation()),
-                        DecodeTool.getLatLngFromString(currentPosition.getPosition())
+                final float[] distance = {(float) Tool.calculateDistance(
+                        Tool.getLatLngFromString(trip.getPickUpLocation()),
+                        Tool.getLatLngFromString(currentPosition.getPosition())
                 )};
 
                 distance[0] = distance[0] / 1000;

@@ -18,7 +18,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.view.KeyEvent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,14 +26,12 @@ import android.widget.Toast;
 
 import com.example.lightning.R;
 import com.example.lightning.models.CurrentPosition;
-import com.example.lightning.models.Driver;
 import com.example.lightning.models.Trip;
 import com.example.lightning.services.MyLocationServices;
 import com.example.lightning.tools.Const;
-import com.example.lightning.tools.DecodeTool;
+import com.example.lightning.tools.Tool;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -50,15 +47,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.annotations.Until;
-import com.google.maps.android.data.Geometry;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
-
-import de.hdodenhof.circleimageview.CircleImageView;
 
 public class SearchForDriverActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -365,7 +358,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
 
         if (!(listNearByDrivers.isEmpty())) {
             for (CurrentPosition position : listNearByDrivers) {
-                LatLng latLng = DecodeTool.getLatLngFromString(position.getPosition());
+                LatLng latLng = Tool.getLatLngFromString(position.getPosition());
                 float bearing = Float.parseFloat(position.getBearing());
                 if (position.getVehicleType().equals(Const.car)) {
                     driverMarkerIconName = carMarker;

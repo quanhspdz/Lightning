@@ -15,6 +15,8 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.lightning.activities.ChooseDestinationActivity;
+import com.example.lightning.adapters.PlaceAdapter;
 import com.example.lightning.models.Place;
 
 import org.json.JSONArray;
@@ -26,9 +28,7 @@ import java.util.List;
 
 public class Goong {
 
-    public static List<Place> searchPlace(Context context, String keyWord, String api_key) {
-        List<Place> places = new ArrayList<>();
-
+    public static void searchPlace(Context context, String keyWord, String api_key, List<Place> listPlace, PlaceAdapter placeAdapter) {
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         String url = Uri.parse("https://rsapi.goong.io/Place/AutoComplete")
                 .buildUpon()
@@ -40,6 +40,7 @@ public class Goong {
             @Override
             public void onResponse(JSONObject response) {
                 try {
+                    listPlace.clear();
                     JSONArray listPredictions = response.getJSONArray("predictions");
                     for (int i = 0; i < listPredictions.length(); i++) {
                         JSONObject prediction = listPredictions.getJSONObject(i);
@@ -49,9 +50,9 @@ public class Goong {
                         String secondary_text = structured_formatting.getString("secondary_text");
 
                         Place place = new Place(placeId, main_text, secondary_text);
-                        places.add(place);
+                        listPlace.add(place);
                     }
-
+                    placeAdapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
                     Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
@@ -67,8 +68,6 @@ public class Goong {
         RetryPolicy retryPolicy = new DefaultRetryPolicy(30000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
         jsonObjectRequest.setRetryPolicy(retryPolicy);
         requestQueue.add(jsonObjectRequest);
-
-        return places;
     }
 
 }

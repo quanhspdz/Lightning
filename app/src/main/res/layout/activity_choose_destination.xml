@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
+        android:id="@+id/frame_maps"
+        android:background="@color/green"
         android:layout_above="@id/layoutBottom">
 
         <fragment
@@ -66,7 +68,6 @@
             android:maxLength="50"
             android:textColorHint="@color/secondary_text"
             android:textColor="@color/primary_text"
-            android:layout_marginBottom="10dp"
             android:padding="10dp"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -80,6 +81,28 @@
             android:id="@+id/button_search_des"
             android:backgroundTint="@color/white"/>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="70dp"
+            android:layout_below="@id/edt_pickUpPos"
+            android:id="@+id/recyclerView_pickUp"
+            android:background="@color/white"
+            android:layout_marginTop="2dp"
+            android:visibility="visible"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="70dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/white"
+            android:layout_below="@id/edt_dropOfPos"
+            android:id="@+id/recyclerView_dropOff"
+            android:visibility="visible"/>
+
     </RelativeLayout>
 
     <LinearLayout
@@ -92,7 +115,6 @@
         android:orientation="vertical"
         android:visibility="gone"
         android:weightSum="2">
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -199,13 +221,12 @@
     <androidx.appcompat.widget.AppCompatButton
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="10dp"
         android:background="@drawable/button_background"
         android:textColor="@color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
         android:text="Next"
         android:textSize="18sp"
         android:id="@+id/buttonConfirm"/>
-
 
 </RelativeLayout>

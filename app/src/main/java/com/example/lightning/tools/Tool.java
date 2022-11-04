@@ -1,10 +1,12 @@
 package com.example.lightning.tools;
 
+import android.app.Activity;
 import android.location.Location;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.gms.maps.model.LatLng;
 
-public class DecodeTool {
+public class Tool {
     public static LatLng getLatLngFromString(String location) {
         LatLng latLng;
 
@@ -26,5 +28,17 @@ public class DecodeTool {
         locationDest.setLongitude(dest.longitude);
 
         return locationOri.distanceTo(locationDest);
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager =
+                (InputMethodManager) activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE);
+        if(inputMethodManager.isAcceptingText()){
+            inputMethodManager.hideSoftInputFromWindow(
+                    activity.getCurrentFocus().getWindowToken(),
+                    0
+            );
+        }
     }
 }
