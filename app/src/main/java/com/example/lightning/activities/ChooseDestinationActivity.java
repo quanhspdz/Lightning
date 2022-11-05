@@ -325,18 +325,6 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 && !timeCost.isEmpty() && pickUpPos != null && destination != null;
     }
 
-    private void getAutoCompleteDestination(Integer requestCode, String input) {
-        List<Place.Field> fieldList = Arrays.asList(Place.Field.ADDRESS,
-                Place.Field.LAT_LNG, Place.Field.NAME);
-
-        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY,
-                fieldList)
-                .setInitialQuery(input)
-                .build(ChooseDestinationActivity.this);
-
-        startActivityForResult(intent, requestCode);
-    }
-
     private void init() {
         edtDestination = findViewById(R.id.edt_dropOfPos);
         edtPickUp = findViewById(R.id.edt_pickUpPos);
@@ -439,39 +427,6 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
 // finally change the color
         window.setStatusBarColor(ContextCompat.getColor(this, R.color.blue_toolbar));
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == CHOOSE_DES_REQUEST_CODE && resultCode == RESULT_OK) {
-            Place place = Autocomplete.getPlaceFromIntent(data);
-            int maxLength = 28;
-            edtDestination.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
-            edtDestination.setText(place.getAddress());
-
-            destination = place.getLatLng();
-            distanceIsCalculated = false;
-            desName = place.getAddress();
-            //mark this location to google map
-            if (map != null) {
-                markLocation(destination, 1);
-            }
-        } else if (requestCode == CHOOSE_PICK_UP_REQUEST_CODE && resultCode == RESULT_OK) {
-            Place place = Autocomplete.getPlaceFromIntent(data);
-            int maxLength = 28;
-            edtPickUp.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
-            edtPickUp.setText(place.getAddress());
-
-            pickUpPos = place.getLatLng();
-            distanceIsCalculated = false;
-            pickUpName = place.getAddress();
-            //mark this location to google map
-            if (map != null) {
-                markLocation(pickUpPos, 0);
-            }
-        }
     }
 
     private void direction(LatLng origin, LatLng destination) throws IOException {
