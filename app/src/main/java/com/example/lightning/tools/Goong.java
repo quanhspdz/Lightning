@@ -2,6 +2,8 @@ package com.example.lightning.tools;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.InputFilter;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.browser.trusted.sharing.ShareTarget;
@@ -18,6 +20,8 @@ import com.android.volley.toolbox.Volley;
 import com.example.lightning.activities.ChooseDestinationActivity;
 import com.example.lightning.adapters.PlaceAdapter;
 import com.example.lightning.models.Place;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +60,44 @@ public class Goong {
 
                 } catch (JSONException e) {
                     Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        RetryPolicy retryPolicy = new DefaultRetryPolicy(30000, DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+        jsonObjectRequest.setRetryPolicy(retryPolicy);
+        requestQueue.add(jsonObjectRequest);
+    }
+
+    public static void getPlaceLatLng(Context context, Place place, String api_key) {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        String url = Uri.parse("https://rsapi.goong.io/Place/Detail")
+                .buildUpon()
+                .appendQueryParameter("place_id", place.getPlaceId())
+                .appendQueryParameter("api_key", api_key)
+                .toString();
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONObject result = response.getJSONObject("result");
+                    String placeName = result.getString("formatted_address");
+                    JSONObject geometry = result.getJSONObject("geometry");
+                    JSONObject location = geometry.getJSONObject("location");
+                    String lat = location.getString("lat");
+                    String lng = location.getString("lng");
+
+                    LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+                    place.setLatLng(latLng);
+                    place.setPlaceName(placeName);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {

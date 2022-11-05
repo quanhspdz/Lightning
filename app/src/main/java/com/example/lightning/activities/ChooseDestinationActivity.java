@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -41,6 +42,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
 import com.example.lightning.adapters.PlaceAdapter;
+import com.example.lightning.interfaces.OnItemClickListener;
 import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
 import com.example.lightning.tools.Goong;
@@ -105,14 +107,14 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     public static String MAPS_API_KEY;
     public static String GOONG_API_KEY;
 
-    boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
+    public static boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
     boolean tripIsCreatedOnFirebase = false;
     Trip trip;
 
-    LatLng pickUpPos, destination, UET;
-    String distance, timeCost, moneyCostCar, moneyCostMotor, pickUpName, desName;
+    public static LatLng pickUpPos, destination, UET;
+    public static String distance, timeCost, moneyCostCar, moneyCostMotor, pickUpName, desName;
 
-    GoogleMap map;
+    public static GoogleMap map;
 
     ProgressDialog progressDialog;
 
@@ -265,6 +267,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     recyclerViewDropOff.setVisibility(View.GONE);
                     recyclerViewPickUp.setVisibility(View.GONE);
                     gotListPlaces = false;
+
+                    layoutBottom.setVisibility(View.GONE);
                 }
             }
         });
@@ -276,6 +280,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     recyclerViewDropOff.setVisibility(View.GONE);
                     recyclerViewPickUp.setVisibility(View.GONE);
                     gotListPlaces = false;
+
+                    layoutBottom.setVisibility(View.GONE);
                 }
             }
         });
@@ -351,8 +357,22 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         pickUpPlaces = new ArrayList<>();
         dropOffPlaces = new ArrayList<>();
 
-        pickUpAdapter = new PlaceAdapter(pickUpPlaces, getApplicationContext());
-        dropOffAdapter = new PlaceAdapter(dropOffPlaces, getApplicationContext());
+        pickUpAdapter = new PlaceAdapter(pickUpPlaces, getApplicationContext(), new OnItemClickListener() {
+            @Override
+            public void onItemClick(com.example.lightning.models.Place item) {
+                recyclerViewPickUp.setVisibility(View.GONE);
+                Goong.getPlaceLatLng(getApplicationContext(), item, GOONG_API_KEY);
+                waitingPlace(item, edtPickUp, 0);
+            }
+        });
+        dropOffAdapter = new PlaceAdapter(dropOffPlaces, getApplicationContext(), new OnItemClickListener() {
+            @Override
+            public void onItemClick(com.example.lightning.models.Place item) {
+                recyclerViewDropOff.setVisibility(View.GONE);
+                Goong.getPlaceLatLng(getApplicationContext(), item, GOONG_API_KEY);
+                waitingPlace(item, edtDestination, 1);
+            }
+        });
 
         recyclerViewPickUp.setHasFixedSize(true);
         recyclerViewDropOff.setHasFixedSize(true);
@@ -367,6 +387,45 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         mapFragment.getMapAsync(this);
 
         UET = new LatLng(21.038902482537342, 105.78296809797327); //Dai hoc Cong Nghe Lat Lng
+    }
+
+    private void waitingPlace(com.example.lightning.models.Place place, EditText editText, int type) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (place.getLatLng() == null) {
+
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        editText.setText(place.getPlaceName());
+                        int maxLength = 28;
+                        editText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
+                        editText.setText(place.getPlaceName());
+                        distanceIsCalculated = false;
+
+                        if (type == 1) {
+                            pickUpPos = place.getLatLng();
+                            pickUpName = place.getPlaceName();
+                            //mark this location to google map
+                            if (map != null) {
+                                markLocation(pickUpPos, type);
+                            }
+                        } else {
+                            destination = place.getLatLng();
+                            desName = place.getPlaceName();
+                            //mark this location to google map
+                            if (map != null) {
+                                markLocation(destination, type);
+                            }
+                        }
+
+                    }
+                });
+            }
+        }).start();
     }
 
     private void setStatusBarColor() {

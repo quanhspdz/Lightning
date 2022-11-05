@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.lightning.R;
+import com.example.lightning.interfaces.OnItemClickListener;
 import com.example.lightning.models.Place;
 
 import java.util.List;
@@ -18,10 +19,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
 
     private List<Place> listPlaces;
     private Context context;
+    private OnItemClickListener listener;
 
-    public PlaceAdapter(List<Place> listPlaces, Context context) {
+    public PlaceAdapter(List<Place> listPlaces, Context context, OnItemClickListener listener) {
         this.listPlaces = listPlaces;
         this.context = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,6 +39,8 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         Place place = listPlaces.get(position);
         holder.textMain.setText(place.getMainText());
         holder.textSecondary.setText(place.getSecondaryText());
+
+        holder.bind(listPlaces.get(position), listener);
     }
 
     @Override
@@ -46,12 +51,20 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView textMain, textSecondary;
+        public void bind(final Place item, final OnItemClickListener listener) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override public void onClick(View v) {
+                    listener.onItemClick(item);
+                }
+            });
+        }
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             textMain = itemView.findViewById(R.id.text_main);
             textSecondary = itemView.findViewById(R.id.text_secondary);
+
         }
     }
 
