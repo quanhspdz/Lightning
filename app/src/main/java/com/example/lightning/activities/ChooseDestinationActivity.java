@@ -389,12 +389,11 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     @Override
                     public void run() {
                         editText.setText(place.getPlaceName());
-                        int maxLength = 28;
-                        editText.setFilters(new InputFilter[] {new InputFilter.LengthFilter(maxLength)});
                         editText.setText(place.getPlaceName());
+                        editText.setSingleLine(true);
                         distanceIsCalculated = false;
 
-                        if (type == 1) {
+                        if (type == 0) {
                             pickUpPos = place.getLatLng();
                             pickUpName = place.getPlaceName();
                             //mark this location to google map
