@@ -9,7 +9,9 @@ public class Const {
     public static final String searching = "searchingForDriver";
     public static final String driverFound = "driverFound";
     public static final String waitingPickUp = "waitingToPickUp";
+    public static final String driverArrivedPickUp = "driverArrivedPickUp";
     public static final String onGoing = "onGoing";
+    public static final String arrivedDropOff = "arrivedDropOff";
     public static final String canceled = "canceled";
     public static final String success = "success";
 

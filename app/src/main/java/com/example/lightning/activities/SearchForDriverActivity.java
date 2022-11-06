@@ -439,7 +439,12 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Trip trip = snapshot.getValue(Trip.class);
                         if (trip != null) {
-                            if (trip.getStatus().equals(Const.waitingPickUp) && trip.getDriverId() != null) {
+                            if ((trip.getStatus().equals(Const.waitingPickUp)
+                                    || trip.getStatus().equals(Const.driverArrivedPickUp)
+                                    || trip.getStatus().equals(Const.onGoing)
+                                    || trip.getStatus().equals(Const.arrivedDropOff))
+                                    && trip.getDriverId() != null
+                                    && !WaitingPickUp.isRunning) {
                                 Intent intent = new Intent(SearchForDriverActivity.getInstance(), WaitingPickUp.class);
                                 intent.putExtra("tripId", trip.getId());
                                 intent.putExtra("driverId", trip.getDriverId());

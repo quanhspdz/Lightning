@@ -106,6 +106,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     boolean keyIsLoaded = false;
     boolean focusOnDriver = true;
 
+    public static boolean isRunning = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -570,5 +572,19 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         maps.setMyLocationEnabled(true);
         markCurrentLocation();
         getDataFromFirebase();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        isRunning = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        isRunning = false;
     }
 }
