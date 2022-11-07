@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity {
         btnYourLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!SearchForDriverActivity.isRunning) {
+                if (!SearchForDriverActivity.isRunning && !WaitingPickUp.isRunning) {
                     Intent intent = new Intent(MainActivity.this, SearchForDriverActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                 }
             }

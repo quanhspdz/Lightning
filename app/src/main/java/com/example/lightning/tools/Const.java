@@ -10,6 +10,7 @@ public class Const {
     public static final String driverFound = "driverFound";
     public static final String waitingPickUp = "waitingToPickUp";
     public static final String driverArrivedPickUp = "driverArrivedPickUp";
+    public static final String waitingForAccept = "waitingDriverAccept";
     public static final String onGoing = "onGoing";
     public static final String arrivedDropOff = "arrivedDropOff";
     public static final String canceled = "canceled";

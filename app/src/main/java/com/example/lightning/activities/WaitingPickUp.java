@@ -113,6 +113,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     int pickUpPolyOption = 0, dropOffPolyOption = 1;
 
+    boolean pickUpAndDropOffIsMarked = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -286,7 +288,6 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         distance[0] = Math.round(distance[0] * 10);
                         distance[0] /= 10;
                         textDistanceLeft.setText(String.format("%s km", distance[0]));
-
                     }});
 
             }
@@ -363,8 +364,11 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                                markPickUpAndDropOff(trip);
-                                setVehicleIcon(trip);
+                                if (!pickUpAndDropOffIsMarked) {
+                                    markPickUpAndDropOff(trip);
+                                    setVehicleIcon(trip);
+                                    pickUpAndDropOffIsMarked = true;
+                                }
                             }
                         }
 
@@ -386,7 +390,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     private void setTripInfoView(Trip trip) throws IOException {
         if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
-            textStatus.setText("Driver have arrived to pick-up point");
+            textStatus.setText("Driver has arrived to pick-up point");
             textTimeLeft.setVisibility(View.GONE);
             textDistanceLeft.setVisibility(View.GONE);
         } else if (trip.getStatus().equals(Const.onGoing)) {
@@ -430,7 +434,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             public void onClick(View v) {
                 if (focusOnDriver) {
                     focusOnDriver = false;
-                    if (dropOffPolyline == null) {
+                    if (!dropOffPolyIsDrawn) {
                         zoomToPickUpRoute();
                     } else {
                         zoomToRoute(
