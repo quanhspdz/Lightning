@@ -105,8 +105,13 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     boolean polylineIsDrawn = false;
     boolean keyIsLoaded = false;
     boolean focusOnDriver = true;
+    boolean pickUpPolyIsDrawn = false, dropOffPolyIsDrawn = false;
 
     public static boolean isRunning = false;
+
+    public static Polyline pickUpPolyline, dropOffPolyline;
+
+    int pickUpPolyOption = 0, dropOffPolyOption = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +138,16 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
         LatLngBounds bounds = new LatLngBounds.Builder()
                 .include(destination)
+                .include(origin).build();
+        Point point = new Point();
+        getWindowManager().getDefaultDisplay().getSize(point);
+
+        maps.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
+    }
+
+    public void zoomToRoute(LatLng origin, LatLng dest) {
+        LatLngBounds bounds = new LatLngBounds.Builder()
+                .include(dest)
                 .include(origin).build();
         Point point = new Point();
         getWindowManager().getDefaultDisplay().getSize(point);
@@ -209,12 +224,12 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                                 updateDriverLocation(currentPosition);
 
                                 //draw a polyline between driver and pick-up point
-                                if (trip != null && !polylineIsDrawn) {
-                                    polylineIsDrawn = true;
+                                if (trip != null && !pickUpPolyIsDrawn && !dropOffPolyIsDrawn) {
+                                    pickUpPolyIsDrawn = true;
                                     LatLng origin = Tool.getLatLngFromString(currentPosition.getPosition());
                                     LatLng des = Tool.getLatLngFromString(trip.getPickUpLocation());
                                     try {
-                                        direction(origin, des);
+                                        direction(origin, des, pickUpPolyOption);
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
@@ -343,7 +358,11 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             trip = snapshot.getValue(Trip.class);
                             if (trip != null) {
-                                setTripInfoView(trip);
+                                try {
+                                    setTripInfoView(trip);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 markPickUpAndDropOff(trip);
                                 setVehicleIcon(trip);
                             }
@@ -365,7 +384,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
-    private void setTripInfoView(Trip trip) {
+    private void setTripInfoView(Trip trip) throws IOException {
         if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
             textStatus.setText("Driver have arrived to pick-up point");
             textTimeLeft.setVisibility(View.GONE);
@@ -382,6 +401,19 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             textStatus.setText("Driver is coming in ");
             textTimeLeft.setVisibility(View.VISIBLE);
             textDistanceLeft.setVisibility(View.VISIBLE);
+            return;
+        }
+
+        if (!dropOffPolyIsDrawn) {
+            dropOffPolyIsDrawn = true;
+            direction(
+                    Tool.getLatLngFromString(trip.getPickUpLocation()),
+                    Tool.getLatLngFromString(trip.getDropOffLocation()),
+                    dropOffPolyOption
+            );
+            if (pickUpPolyIsDrawn) {
+                pickUpPolyline.remove();
+            }
         }
      }
 
@@ -398,7 +430,13 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             public void onClick(View v) {
                 if (focusOnDriver) {
                     focusOnDriver = false;
-                    zoomToPickUpRoute();
+                    if (dropOffPolyline == null) {
+                        zoomToPickUpRoute();
+                    } else {
+                        zoomToRoute(
+                                Tool.getLatLngFromString(trip.getPickUpLocation()),
+                                Tool.getLatLngFromString(trip.getDropOffLocation()));
+                    }
                     buttonFocus.setImageResource(R.drawable.unfocus);
                 } else {
                     focusOnDriver = true;
@@ -464,7 +502,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     }
 
-    private void direction(LatLng origin, LatLng destination) throws IOException {
+    private void direction(LatLng origin, LatLng destination, int option) throws IOException {
         String strOrigin = origin.latitude + ", " + origin.longitude;
         String strDestination = destination.latitude + ", " + destination.longitude;
         String vehicleType;
@@ -517,7 +555,13 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         }
 
                         assert polylineOptions != null;
-                        Polyline tempPoly = maps.addPolyline(polylineOptions);
+
+                        if (option == pickUpPolyOption) {
+                            pickUpPolyline = maps.addPolyline(polylineOptions);
+                        } else {
+                            dropOffPolyline = maps.addPolyline(polylineOptions);
+                        }
+
                         LatLngBounds bounds = new LatLngBounds.Builder()
                                 .include(new LatLng(destination.latitude, destination.longitude))
                                 .include(new LatLng(origin.latitude, origin.longitude)).build();

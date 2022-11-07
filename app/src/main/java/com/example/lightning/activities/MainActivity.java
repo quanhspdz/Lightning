@@ -43,8 +43,10 @@ public class MainActivity extends AppCompatActivity {
         btnYourLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SearchForDriverActivity.class);
-                startActivity(intent);
+                if (!SearchForDriverActivity.isRunning) {
+                    Intent intent = new Intent(MainActivity.this, SearchForDriverActivity.class);
+                    startActivity(intent);
+                }
             }
         });
     }

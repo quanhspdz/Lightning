@@ -94,6 +94,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
 
     boolean statusIsUpdated = false;
 
+    public static boolean isRunning = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +151,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
             tripId = intent.getStringExtra("tripId");
             getTripInfo(tripId);
         }
+
+        isRunning = true;
     }
 
     private void getLastedTrip() {
@@ -475,8 +479,10 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStop() {
+        super.onStop();
+
+        isRunning = false;
     }
 
 }
