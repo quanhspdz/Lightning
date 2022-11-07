@@ -51,7 +51,7 @@
                 android:layout_centerVertical="true"/>
 
             <TextView
-                android:id="@+id/text_coming"
+                android:id="@+id/text_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
@@ -75,7 +75,7 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="5dp"
                 android:layout_marginBottom="5dp"
-                android:layout_toEndOf="@id/text_coming"
+                android:layout_toEndOf="@id/text_status"
                 android:background="@drawable/button_background_ghost_white"
                 android:text="N/A"
                 android:textColor="@color/white"

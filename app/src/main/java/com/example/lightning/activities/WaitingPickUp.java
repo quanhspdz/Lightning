@@ -71,7 +71,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     RelativeLayout layoutStatusUpdate, layoutBottom;
     TextView textTimeLeft, textDistanceLeft, textPlate, textVehicleName,
-            textDriverName;
+            textDriverName, textStatus;
     CircleImageView imgFocus, imgDriver;
     RelativeLayout btnCall, btnMessage;
     AppCompatButton btnCancel;
@@ -366,8 +366,24 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void setTripInfoView(Trip trip) {
-
-    }
+        if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
+            textStatus.setText("Driver have arrived to pick-up point");
+            textTimeLeft.setVisibility(View.GONE);
+            textDistanceLeft.setVisibility(View.GONE);
+        } else if (trip.getStatus().equals(Const.onGoing)) {
+            textStatus.setText("Going to your destination");
+            textTimeLeft.setVisibility(View.GONE);
+            textDistanceLeft.setVisibility(View.GONE);
+        } else if (trip.getStatus().equals(Const.arrivedDropOff)) {
+            textStatus.setText("You have arrived to your destination");
+            textTimeLeft.setVisibility(View.GONE);
+            textDistanceLeft.setVisibility(View.GONE);
+        } else if (trip.getStatus().equals(Const.waitingPickUp)) {
+            textStatus.setText("Driver is coming in ");
+            textTimeLeft.setVisibility(View.VISIBLE);
+            textDistanceLeft.setVisibility(View.VISIBLE);
+        }
+     }
 
     private void listener() {
         layoutStatusUpdate.setOnClickListener(new View.OnClickListener() {
@@ -417,6 +433,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         imgFocus = findViewById(R.id.img_focusOnMe);
         imgDriver = findViewById(R.id.img_driver);
         buttonFocus = findViewById(R.id.img_focusOnMe);
+        textStatus = findViewById(R.id.text_status);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -558,6 +575,10 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
                     }
                 });
+    }
+
+    private void updateTripStatus() {
+
     }
 
     @Override
