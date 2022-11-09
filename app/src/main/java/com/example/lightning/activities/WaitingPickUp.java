@@ -71,7 +71,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     RelativeLayout layoutStatusUpdate, layoutBottom;
     TextView textTimeLeft, textDistanceLeft, textPlate, textVehicleName,
-            textDriverName, textStatus;
+            textDriverName, textStatus, textMoney, textPaymentMethod;
     CircleImageView imgFocus, imgDriver;
     RelativeLayout btnCall, btnMessage;
     AppCompatButton btnCancel;
@@ -389,6 +389,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     }
 
     private void setTripInfoView(Trip trip) throws IOException {
+        textMoney.setText(trip.getCost());
+
         if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
             textStatus.setText("Driver has arrived to pick-up point");
             textTimeLeft.setVisibility(View.GONE);
@@ -406,6 +408,11 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             textTimeLeft.setVisibility(View.VISIBLE);
             textDistanceLeft.setVisibility(View.VISIBLE);
             return;
+        } else if (trip.getStatus().equals(Const.success)) {
+            Intent intent = new Intent(WaitingPickUp.this, ReviewTrip.class);
+            Toast.makeText(this, "Done!", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+            finish();
         }
 
         if (!dropOffPolyIsDrawn) {
@@ -476,6 +483,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         imgDriver = findViewById(R.id.img_driver);
         buttonFocus = findViewById(R.id.img_focusOnMe);
         textStatus = findViewById(R.id.text_status);
+        textMoney = findViewById(R.id.text_money);
+        textPaymentMethod = findViewById(R.id.text_paymentMethod);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 

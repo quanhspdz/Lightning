@@ -125,9 +125,9 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="350dp"
             android:visibility="visible"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="15dp"
             android:layout_marginBottom="20dp"
             android:layout_marginHorizontal="20dp"
             android:layout_alignParentTop="true"
@@ -135,7 +135,10 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/layout_driverAndVehicleInfo"
+                android:layout_alignParentTop="true"
+                android:layout_marginBottom="15dp"
                 android:layout_above="@id/layout_connection">
 
                 <TextView
@@ -153,26 +156,17 @@
                     android:text="Honda Wave S"
                     android:textSize="23sp"
                     android:layout_below="@id/text_plateNumber"
-                    android:layout_marginTop="15dp"
+                    android:layout_marginTop="10dp"
                     android:layout_alignParentStart="true"
                     android:textStyle="bold"
                     android:id="@+id/text_vehicleName"/>
 
                 <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="85dp"
-                    android:layout_height="85dp"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
                     android:src="@drawable/user_blue"
                     android:id="@+id/img_driver"
                     android:layout_alignParentEnd="true"/>
-
-                <FrameLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grey_line"
-                    android:layout_below="@id/img_driver"
-                    android:id="@+id/frame_driver_name"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="20dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -184,6 +178,65 @@
                     android:textStyle="bold"
                     android:textColor="@color/secondary_text"/>
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grey_line"
+                    android:layout_below="@id/img_driver"
+                    android:id="@+id/frame_driver_name"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/grey_line"
+                    android:layout_below="@id/textDriverName"
+                    android:id="@+id/frame_payment"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:layout_alignParentBottom="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Payment"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary_text"
+                        android:layout_marginBottom="10dp"
+                        android:id="@+id/text_paymentAttention"
+                        android:layout_alignParentTop="true"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/text_money"
+                        android:text="123,456 đ"
+                        android:textColor="@color/secondary_text"
+                        android:textStyle="bold"
+                        android:layout_below="@id/text_paymentAttention"
+                        android:textSize="20sp"
+                        android:layout_alignParentStart="true"/>
+
+                    <TextView
+                        android:id="@+id/text_paymentMethod"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="15dp"
+                        android:layout_below="@id/text_paymentAttention"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="1dp"
+                        android:background="@drawable/button_background_grey_line"
+                        android:layout_toEndOf="@id/text_money"
+                        android:text="Cash"
+                        android:textSize="20sp" />
+
+                </RelativeLayout>
 
             </RelativeLayout>
 
@@ -193,7 +246,7 @@
                 android:layout_above="@id/buttonCancel"
                 android:orientation="horizontal"
                 android:id="@+id/layout_connection"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="10dp"
                 android:weightSum="2">
 
                 <RelativeLayout
@@ -282,6 +335,5 @@
         </RelativeLayout>
 
     </RelativeLayout>
-
 
 </RelativeLayout>
