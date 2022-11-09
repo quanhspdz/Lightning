@@ -115,6 +115,9 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     boolean pickUpAndDropOffIsMarked = false;
 
+    private final int CALL_REQUEST_CODE = 123;
+    private final int SMS_REQUEST_CODE = 234;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -453,6 +456,46 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                     focusOnDriver = true;
                     zoomToDriver();
                     buttonFocus.setImageResource(R.drawable.focus);
+                }
+            }
+        });
+
+        btnCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (driver != null) {
+                    if (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.CALL_PHONE)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(WaitingPickUp.this,
+                                new String[]{Manifest.permission.CALL_PHONE},
+                                CALL_REQUEST_CODE);
+                    } else {
+                        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + driver.getPhoneNumber()));
+                        startActivity(intent);
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Driver is null!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        btnMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (driver != null) {
+                    if (ContextCompat.checkSelfPermission(getApplicationContext(),android.Manifest.permission.SEND_SMS)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(WaitingPickUp.this,
+                                new String[]{Manifest.permission.SEND_SMS},
+                                SMS_REQUEST_CODE);
+                    } else {
+                        String number = driver.getPhoneNumber();
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.fromParts("sms", number,null));
+                        //intent.putExtra("sms_body", "Hehe");
+                        startActivity(intent);
+                    }
+                } else {
+                    Toast.makeText(WaitingPickUp.this, "Driver is null!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
