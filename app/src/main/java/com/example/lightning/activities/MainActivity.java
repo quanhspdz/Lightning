@@ -18,7 +18,7 @@ import com.example.lightning.R;
 public class MainActivity extends AppCompatActivity {
 
     EditText edtSearchPlace;
-    FrameLayout btnYourLocation;
+    FrameLayout btnYourLocation, btnHistory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +50,20 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        btnHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ReviewTrip.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void init() {
         edtSearchPlace = findViewById(R.id.edtSearch);
         btnYourLocation = findViewById(R.id.buttonYourLocation);
+        btnHistory = findViewById(R.id.buttonHistory);
     }
 
     private void setStatusBarColor() {
