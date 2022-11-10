@@ -531,6 +531,9 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         //calculate money cost
         String[] arrayDistance = distance.split(" ");
         double distanceDouble = Double.parseDouble(arrayDistance[0]);
+        if (distance.contains(" m")) {
+            distanceDouble /= 1000;
+        }
         double costCarDouble = Const.costPerKmCar * distanceDouble;
         double costMotorDouble = Const.costPerKmMotor * distanceDouble;
 
