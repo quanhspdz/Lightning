@@ -29,6 +29,52 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:id="@+id/layout_choosePlace">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:id="@+id/edt_pickUpPos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:singleLine="true"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/edt_location_background"
+            android:hint=" Your location"
+            android:drawableStart="@drawable/blue_pin"
+            android:textColorHint="@color/secondary_text"
+            android:textColor="@color/primary_text"
+            android:focusableInTouchMode="false"
+            android:maxLines="1"
+            android:padding="10dp"/>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_below="@id/edt_pickUpPos"
+            android:id="@+id/edt_dropOfPos"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/edt_location_background"
+            android:layout_marginTop="5dp"
+            android:hint=" Choose destination"
+            android:drawableStart="@drawable/red_pin"
+            android:focusableInTouchMode="false"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textColorHint="@color/secondary_text"
+            android:textColor="@color/primary_text"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_above="@id/layout_bottom"
         android:background="@drawable/bottom_layout_blue"

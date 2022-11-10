@@ -17,6 +17,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -76,6 +77,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     RelativeLayout btnCall, btnMessage;
     AppCompatButton btnCancel;
     CircleImageView buttonFocus;
+    EditText edtPickUp, edtDropOff;
 
     boolean infoIsHided = true;
 
@@ -393,6 +395,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
 
     private void setTripInfoView(Trip trip) throws IOException {
         textMoney.setText(trip.getCost());
+        edtPickUp.setText(trip.getPickUpName());
+        edtDropOff.setText(trip.getDropOffName());
 
         if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
             textStatus.setText("Driver has arrived to pick-up point");
@@ -528,6 +532,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         textStatus = findViewById(R.id.text_status);
         textMoney = findViewById(R.id.text_money);
         textPaymentMethod = findViewById(R.id.text_paymentMethod);
+        edtPickUp = findViewById(R.id.edt_pickUpPos);
+        edtDropOff = findViewById(R.id.edt_dropOfPos);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
