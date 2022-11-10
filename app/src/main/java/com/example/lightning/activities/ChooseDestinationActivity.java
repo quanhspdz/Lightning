@@ -107,7 +107,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     public static String MAPS_API_KEY;
     public static String GOONG_API_KEY;
 
-    public static boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
+    public boolean motorIsChosen = false, carIsChosen = false, distanceIsCalculated = false;
     boolean tripIsCreatedOnFirebase = false;
     Trip trip;
 
@@ -123,6 +123,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     public static List<com.example.lightning.models.Place> pickUpPlaces, dropOffPlaces;
 
     boolean gotListPlaces = false;
+
+    boolean pickUpIsChosen = false, destIsChosen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,6 +180,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     Goong.searchPlace(getApplicationContext(), input, GOONG_API_KEY, pickUpPlaces, pickUpAdapter);
                     Tool.hideSoftKeyboard(ChooseDestinationActivity.this);
                     gotListPlaces = true;
+                    pickUpIsChosen = true;
                 }
             }
         });
@@ -193,6 +196,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     Goong.searchPlace(getApplicationContext(), input, GOONG_API_KEY, dropOffPlaces, dropOffAdapter);
                     Tool.hideSoftKeyboard(ChooseDestinationActivity.this);
                     gotListPlaces = true;
+                    destIsChosen = true;
                 }
             }
         });
@@ -388,27 +392,28 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        editText.setText(place.getPlaceName());
-                        editText.setText(place.getPlaceName());
-                        editText.setSingleLine(true);
-                        distanceIsCalculated = false;
+                        if (pickUpIsChosen || destIsChosen) {
+                            editText.setText(place.getPlaceName());
+                            editText.setText(place.getPlaceName());
+                            editText.setSingleLine(true);
+                            distanceIsCalculated = false;
 
-                        if (type == 0) {
-                            pickUpPos = place.getLatLng();
-                            pickUpName = place.getPlaceName();
-                            //mark this location to google map
-                            if (map != null) {
-                                markLocation(pickUpPos, type);
-                            }
-                        } else {
-                            destination = place.getLatLng();
-                            desName = place.getPlaceName();
-                            //mark this location to google map
-                            if (map != null) {
-                                markLocation(destination, type);
+                            if (type == 0) {
+                                pickUpPos = place.getLatLng();
+                                pickUpName = place.getPlaceName();
+                                //mark this location to google map
+                                if (map != null) {
+                                    markLocation(pickUpPos, type);
+                                }
+                            } else {
+                                destination = place.getLatLng();
+                                desName = place.getPlaceName();
+                                //mark this location to google map
+                                if (map != null) {
+                                    markLocation(destination, type);
+                                }
                             }
                         }
-
                     }
                 });
             }
@@ -570,12 +575,23 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
 
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(UET, 10));
 
-        if (pickUpPos != null) {
+        if (pickUpPos != null && pickUpIsChosen) {
             markLocation(pickUpPos, 0);
         }
-        if (destination != null) {
+        if (destination != null && pickUpIsChosen) {
             markLocation(destination, 1);
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }
