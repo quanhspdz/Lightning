@@ -181,6 +181,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     Tool.hideSoftKeyboard(ChooseDestinationActivity.this);
                     gotListPlaces = true;
                     pickUpIsChosen = true;
+                    carIsChosen = false;
+                    motorIsChosen = false;
                 }
             }
         });
@@ -197,6 +199,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                     Tool.hideSoftKeyboard(ChooseDestinationActivity.this);
                     gotListPlaces = true;
                     destIsChosen = true;
+                    carIsChosen = false;
+                    motorIsChosen = false;
                 }
             }
         });
@@ -500,6 +504,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                         map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, point.x, 800, 250));
 
                         layoutBottom.setVisibility(View.VISIBLE);
+                        getVehicleTypeFromIntent();
                         distanceIsCalculated = true;
                 } catch (JSONException e) {
                     Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
@@ -569,6 +574,24 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), getResources().getIdentifier(iconName, "drawable", getPackageName()));
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(imageBitmap, width, height, false);
         return resizedBitmap;
+    }
+
+    private void getVehicleTypeFromIntent() {
+        Intent intent = getIntent();
+        String vehicleType = intent.getStringExtra("vehicleType");
+        if (vehicleType != null) {
+            if (vehicleType.equals(Const.motor)) {
+                layoutMotor.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                layoutCar.setBackgroundColor(getResources().getColor(R.color.white));
+                motorIsChosen = true;
+                carIsChosen = false;
+            } else if (vehicleType.equals(Const.car)){
+                layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                layoutMotor.setBackgroundColor(getResources().getColor(R.color.white));
+                motorIsChosen = false;
+                carIsChosen = true;
+            }
+        }
     }
 
     @Override

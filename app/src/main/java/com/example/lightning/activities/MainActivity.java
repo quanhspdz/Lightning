@@ -14,11 +14,12 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 
 import com.example.lightning.R;
+import com.example.lightning.tools.Const;
 
 public class MainActivity extends AppCompatActivity {
 
     EditText edtSearchPlace;
-    FrameLayout btnYourLocation, btnHistory;
+    FrameLayout btnYourLocation, btnHistory, btnCar, btnMotor, btnVoucher, btnSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void listener() {
+
         edtSearchPlace.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,12 +60,34 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        btnCar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ChooseDestinationActivity.class);
+                intent.putExtra("vehicleType", Const.car);
+                startActivity(intent);
+            }
+        });
+
+        btnMotor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ChooseDestinationActivity.class);
+                intent.putExtra("vehicleType", Const.motor);
+                startActivity(intent);
+            }
+        });
     }
 
     private void init() {
         edtSearchPlace = findViewById(R.id.edtSearch);
         btnYourLocation = findViewById(R.id.buttonYourLocation);
         btnHistory = findViewById(R.id.buttonHistory);
+        btnCar = findViewById(R.id.buttonCar);
+        btnMotor = findViewById(R.id.buttonMotor);
+        btnVoucher = findViewById(R.id.buttonVoucher);
+        btnSettings = findViewById(R.id.buttonSettings);
     }
 
     private void setStatusBarColor() {
