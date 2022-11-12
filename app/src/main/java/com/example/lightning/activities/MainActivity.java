@@ -13,6 +13,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.example.lightning.R;
 import com.example.lightning.models.Passenger;
@@ -90,6 +91,18 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, ChooseDestinationActivity.class);
                 intent.putExtra("vehicleType", Const.motor);
                 startActivity(intent);
+            }
+        });
+        
+        imageProfile.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                startActivity(intent);
+                Toast.makeText(MainActivity.this, "Sign out", Toast.LENGTH_SHORT).show();
+                finish();
+                return false;
             }
         });
     }
