@@ -14,6 +14,8 @@ public class Const {
     public static final String onGoing = "onGoing";
     public static final String arrivedDropOff = "arrivedDropOff";
     public static final String canceled = "canceled";
+    public static final String cancelByPassenger = "canceledByPassenger";
+    public static final String cancelByDriver = "canceledByDriver";
     public static final String success = "success";
 
     public static final String active = "active";

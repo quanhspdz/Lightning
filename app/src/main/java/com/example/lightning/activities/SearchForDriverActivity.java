@@ -2,6 +2,7 @@ package com.example.lightning.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
@@ -18,6 +19,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.InputFilter;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,6 +43,7 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -58,6 +61,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
     EditText edtPickUp, edtDes;
     ImageView imgVehicle;
     TextView textVehicleType, textTimeCost, textMoneyCost;
+    AppCompatButton buttonCancel;
 
     private static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 123;
     private static final int ACCESS_COARSE_LOCATION_REQUEST_CODE = 234;
@@ -102,6 +106,43 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         setContentView(R.layout.activity_search_for_driver);
 
         init();
+        listener();
+    }
+
+    private void listener() {
+        buttonCancel.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                cancelTrip();
+
+                return false;
+            }
+        });
+    }
+
+    private void cancelTrip() {
+        if (trip != null) {
+            trip.setStatus(Const.cancelByPassenger);
+            FirebaseDatabase.getInstance().getReference()
+                    .child("Trips")
+                    .child(trip.getId())
+                    .setValue(trip)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Toast.makeText(SearchForDriverActivity.this, "Your trip has been canceled!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(SearchForDriverActivity.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(SearchForDriverActivity.this, "Can not cancel your trip, try again!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
     private void setTripInfo() {
@@ -128,6 +169,7 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
         textTimeCost = findViewById(R.id.text_timeCost);
         textVehicleType = findViewById(R.id.text_vehicleType);
         imgVehicle = findViewById(R.id.imgVehicle);
+        buttonCancel = findViewById(R.id.buttonCancel);
 
         edtDes.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
         edtPickUp.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
@@ -165,7 +207,10 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                             Trip trip = dataSnapshot.getValue(Trip.class);
                             if (trip != null)
                                 if (trip.getPassengerId().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())) {
-                                    listTrips.add(trip);
+                                    if (!trip.getStatus().equals(Const.cancelByPassenger)
+                                        && !trip.getStatus().equals(Const.cancelByDriver)) {
+                                        listTrips.add(trip);
+                                    }
                                 }
                         }
                         if (listTrips.size() > 0) {
@@ -448,6 +493,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                                     && !trip.getStatus().equals(Const.waitingForAccept)
                                     && !trip.getStatus().equals(Const.canceled)
                                     && !trip.getStatus().equals(Const.success)
+                                    && !trip.getStatus().equals(Const.cancelByDriver)
+                                    && !trip.getStatus().equals(Const.cancelByPassenger)
                                     && trip.getDriverId() != null
                                     && !WaitingPickUp.isRunning) {
                                 Intent intent = new Intent(SearchForDriverActivity.getInstance(), WaitingPickUp.class);

@@ -50,6 +50,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -503,6 +504,15 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 }
             }
         });
+
+        btnCancel.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                cancelTrip();
+
+                return false;
+            }
+        });
     }
 
     private void hideInfo() {
@@ -683,8 +693,29 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 });
     }
 
-    private void updateTripStatus() {
-
+    private void cancelTrip() {
+        if (trip != null) {
+            trip.setStatus(Const.cancelByPassenger);
+            FirebaseDatabase.getInstance().getReference()
+                    .child("Trips")
+                    .child(trip.getId())
+                    .setValue(trip)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Toast.makeText(WaitingPickUp.this, "Your trip has been canceled!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(WaitingPickUp.this, MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(WaitingPickUp.this, "Can not cancel your trip, try again!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
     @Override
