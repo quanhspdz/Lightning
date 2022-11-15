@@ -35,6 +35,7 @@ import com.example.lightning.models.CurrentPosition;
 import com.example.lightning.models.Driver;
 import com.example.lightning.models.Trip;
 import com.example.lightning.models.Vehicle;
+import com.example.lightning.services.MyLocationServices;
 import com.example.lightning.tools.Const;
 import com.example.lightning.tools.Tool;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -419,6 +420,12 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         } else if (trip.getStatus().equals(Const.success)) {
             Intent intent = new Intent(WaitingPickUp.this, ReviewTrip.class);
             Toast.makeText(this, "Done!", Toast.LENGTH_SHORT).show();
+            startActivity(intent);
+            finish();
+        } else if (trip.getStatus().equals(Const.cancelByDriver)) {
+            Intent intent = new Intent(WaitingPickUp.this, SearchForDriverActivity.class);
+            intent.putExtra("tripId", trip.getId());
+            Toast.makeText(this, "Trip has been canceled by driver!", Toast.LENGTH_SHORT).show();
             startActivity(intent);
             finish();
         }

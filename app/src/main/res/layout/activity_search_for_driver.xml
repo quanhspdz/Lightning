@@ -172,7 +172,7 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonCancel"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="55dp"
             android:layout_below="@id/layout_tripInfo"
             android:layout_margin="20dp"
             android:background="@drawable/button_background_red"
