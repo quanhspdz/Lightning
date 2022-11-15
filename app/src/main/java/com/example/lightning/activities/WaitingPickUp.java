@@ -122,6 +122,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     private final int CALL_REQUEST_CODE = 123;
     private final int SMS_REQUEST_CODE = 234;
 
+    boolean movedToSearching = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -422,10 +424,12 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             Toast.makeText(this, "Done!", Toast.LENGTH_SHORT).show();
             startActivity(intent);
             finish();
-        } else if (trip.getStatus().equals(Const.cancelByDriver)) {
+        } else if (trip.getStatus().equals(Const.cancelByDriver) && !movedToSearching) {
             Intent intent = new Intent(WaitingPickUp.this, SearchForDriverActivity.class);
             intent.putExtra("tripId", trip.getId());
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             Toast.makeText(this, "Trip has been canceled by driver!", Toast.LENGTH_SHORT).show();
+            movedToSearching = true;
             startActivity(intent);
             finish();
         }
