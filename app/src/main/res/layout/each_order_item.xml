@@ -32,7 +32,7 @@
         android:layout_toEndOf="@id/frameVehicle"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginTop="6dp"/>
+        android:layout_marginTop="20dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
         android:layout_below="@id/text_destination"
         android:textSize="18sp"
         android:textColor="@color/secondary_text"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="10dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -53,9 +53,10 @@
         android:id="@+id/text_status"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:layout_toEndOf="@id/frameVehicle"
-        android:layout_below="@id/text_time"
-        android:layout_marginTop="8dp"
+        android:layout_below="@id/text_destination"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="10dp"
         android:textColor="@color/white"
         android:paddingVertical="2dp"
         android:paddingHorizontal="8dp"
@@ -64,9 +65,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="0dp"
         android:background="@color/grey_line"
         android:layout_marginHorizontal="20dp"
-        android:layout_below="@id/text_status"/>
+        android:layout_below="@id/frameVehicle"/>
 
 </RelativeLayout>

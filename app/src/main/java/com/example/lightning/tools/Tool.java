@@ -18,6 +18,10 @@ public class Tool {
         return latLng;
     }
 
+    public static String getShortTime(String fullTime) {
+        return fullTime.substring(fullTime.indexOf(" ") + 1, fullTime.indexOf("GMT") - 1);
+    }
+
     public static double calculateDistance(LatLng origin, LatLng dest) {
         Location locationOri = new Location("LocationA");
         locationOri.setLatitude(origin.latitude);

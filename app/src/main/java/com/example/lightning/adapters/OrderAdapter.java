@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.lightning.R;
 import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
+import com.example.lightning.tools.Tool;
 
 import java.util.List;
 
@@ -37,7 +38,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Trip trip = listTrips.get(position);
         holder.textDestination.setText(trip.getDropOffName());
-        holder.textTime.setText(trip.getCreateTime());
+
+        holder.textTime.setText(Tool.getShortTime(trip.getCreateTime()));
+
         if (trip.getStatus().equals(Const.cancelByDriver)
             || trip.getStatus().equals(Const.cancelByPassenger)) {
             holder.textStatus.setText("Canceled");
