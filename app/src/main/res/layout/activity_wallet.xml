@@ -13,6 +13,30 @@
         android:background="@color/blue_toolbar"
         android:id="@+id/toolBar">
 
+        <RelativeLayout
+            android:layout_width="80dp"
+            android:layout_height="40dp"
+            android:id="@+id/relative_back">
+
+            <ImageView
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/img_back"
+                android:src="@drawable/ic_baseline_arrow_back_ios_24"/>
+
+            <TextView
+                android:layout_centerVertical="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/img_back"
+                android:text="Back"
+                android:textSize="18sp"
+                android:textColor="@color/white"/>
+
+
+        </RelativeLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -18,7 +18,8 @@ import com.example.lightning.tools.Tool;
 
 public class WalletActivity extends AppCompatActivity {
 
-    RelativeLayout relativeAddMoney, relativeHistory, relativeShowAddMoney, relativeShowHistory;
+    RelativeLayout relativeAddMoney, relativeHistory, relativeShowAddMoney, relativeShowHistory,
+                    relativeBack;
     FrameLayout frameAddMoney, frameHistory;
     EditText edtAmount;
     AppCompatButton buttonOk, buttonConfirm;
@@ -49,6 +50,7 @@ public class WalletActivity extends AppCompatActivity {
         textConfirmation = findViewById(R.id.text_confirmation);
         textAddMoney = findViewById(R.id.text_addMoney);
         textHistory = findViewById(R.id.text_history);
+        relativeBack = findViewById(R.id.relative_back);
 
         addMoneyIsChosen = true;
         historyIsChosen = false;
@@ -110,6 +112,13 @@ public class WalletActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(WalletActivity.this, "Please enter the amount of money!", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        relativeBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
             }
         });
     }
