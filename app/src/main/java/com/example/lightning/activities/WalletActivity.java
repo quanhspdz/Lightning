@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.lightning.R;
 import com.example.lightning.tools.Tool;
@@ -56,6 +57,8 @@ public class WalletActivity extends AppCompatActivity {
                 frameHistory.setVisibility(View.GONE);
                 relativeShowAddMoney.setVisibility(View.VISIBLE);
                 relativeShowHistory.setVisibility(View.GONE);
+                edtAmount.setText("");
+                textFormattedMoney.setText("");
                 addMoneyIsChosen = true;
                 historyIsChosen = false;
             }
@@ -68,6 +71,8 @@ public class WalletActivity extends AppCompatActivity {
                 frameAddMoney.setVisibility(View.GONE);
                 relativeShowAddMoney.setVisibility(View.GONE);
                 relativeShowHistory.setVisibility(View.VISIBLE);
+                edtAmount.setText("");
+                textFormattedMoney.setText("");
                 addMoneyIsChosen = false;
                 historyIsChosen = true;
             }
@@ -77,8 +82,12 @@ public class WalletActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String amount = edtAmount.getText().toString().trim();
-                textFormattedMoney.setText(Tool.getCurrencyFormat(Double.parseDouble(amount)));
-                Tool.hideSoftKeyboard(WalletActivity.this);
+                if (!amount.isEmpty()) {
+                    textFormattedMoney.setText(Tool.getCurrencyFormat(Double.parseDouble(amount)));
+                    Tool.hideSoftKeyboard(WalletActivity.this);
+                } else {
+                    Toast.makeText(WalletActivity.this, "Please enter the amount of money!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
