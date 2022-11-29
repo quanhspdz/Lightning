@@ -24,6 +24,20 @@
         android:theme="@style/Theme.Lightning"
         tools:targetApi="32">
         <activity
+            android:name=".activities.WalletActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".activities.IncomeDetail"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".activities.OrderHistory"
             android:exported="false">
             <meta-data

@@ -218,7 +218,7 @@
                             android:layout_width="65dp"
                             android:layout_height="65dp"
                             android:layout_gravity="center"
-                            android:src="@drawable/coupon" />
+                            android:src="@drawable/new_wallet" />
 
                     </FrameLayout>
 
@@ -226,7 +226,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:text="Voucher"
+                        android:text="L-Wallet"
                         android:layout_marginBottom="10dp"
                         android:layout_centerHorizontal="true"/>
 
