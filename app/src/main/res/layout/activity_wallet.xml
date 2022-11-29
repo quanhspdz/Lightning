@@ -96,9 +96,11 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/button_add"
                     android:text="Add money"
+                    android:id="@+id/text_addMoney"
+                    android:textStyle="bold"
                     android:clickable="false"
                     android:layout_centerHorizontal="true"
-                    android:textColor="@color/secondary_text"
+                    android:textColor="@color/primary_text"
                     android:layout_marginBottom="5dp" />
 
                 <FrameLayout
@@ -138,6 +140,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@id/button_history"
                     android:text="Transaction history"
+                    android:id="@+id/text_history"
                     android:clickable="false"
                     android:textColor="@color/secondary_text"
                     android:layout_centerHorizontal="true"

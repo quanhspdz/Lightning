@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -21,7 +22,7 @@ public class WalletActivity extends AppCompatActivity {
     FrameLayout frameAddMoney, frameHistory;
     EditText edtAmount;
     AppCompatButton buttonOk, buttonConfirm;
-    TextView textFormattedMoney, textComfirmation;
+    TextView textFormattedMoney, textConfirmation, textAddMoney, textHistory;
 
     boolean addMoneyIsChosen, historyIsChosen;
 
@@ -45,7 +46,9 @@ public class WalletActivity extends AppCompatActivity {
         textFormattedMoney = findViewById(R.id.text_formatted_money);
         relativeShowAddMoney = findViewById(R.id.relativeShowAddMoney);
         relativeShowHistory = findViewById(R.id.relativeShowHistory);
-        textComfirmation = findViewById(R.id.text_confirmation);
+        textConfirmation = findViewById(R.id.text_confirmation);
+        textAddMoney = findViewById(R.id.text_addMoney);
+        textHistory = findViewById(R.id.text_history);
 
         addMoneyIsChosen = true;
         historyIsChosen = false;
@@ -61,10 +64,15 @@ public class WalletActivity extends AppCompatActivity {
                 relativeShowHistory.setVisibility(View.GONE);
                 edtAmount.setText("");
                 textFormattedMoney.setText("");
-                textComfirmation.setVisibility(View.GONE);
+                textConfirmation.setVisibility(View.GONE);
                 buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
                 addMoneyIsChosen = true;
                 historyIsChosen = false;
+
+                textAddMoney.setTypeface(null, Typeface.BOLD);
+                textAddMoney.setTextColor(getResources().getColor(R.color.primary_text));
+                textHistory.setTypeface(null, Typeface.NORMAL);
+                textHistory.setTextColor(getResources().getColor(R.color.secondary_text));
             }
         });
 
@@ -77,10 +85,15 @@ public class WalletActivity extends AppCompatActivity {
                 relativeShowHistory.setVisibility(View.VISIBLE);
                 edtAmount.setText("");
                 textFormattedMoney.setText("");
-                textComfirmation.setVisibility(View.GONE);
+                textConfirmation.setVisibility(View.GONE);
                 buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
                 addMoneyIsChosen = false;
                 historyIsChosen = true;
+
+                textHistory.setTypeface(null, Typeface.BOLD);
+                textHistory.setTextColor(getResources().getColor(R.color.primary_text));
+                textAddMoney.setTypeface(null, Typeface.NORMAL);
+                textAddMoney.setTextColor(getResources().getColor(R.color.secondary_text));
             }
         });
 
@@ -90,7 +103,7 @@ public class WalletActivity extends AppCompatActivity {
                 String amount = edtAmount.getText().toString().trim();
                 if (!amount.isEmpty()) {
                     textFormattedMoney.setVisibility(View.VISIBLE);
-                    textComfirmation.setVisibility(View.VISIBLE);
+                    textConfirmation.setVisibility(View.VISIBLE);
                     buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background));
                     textFormattedMoney.setText(Tool.getCurrencyFormat(Double.parseDouble(amount)));
                     Tool.hideSoftKeyboard(WalletActivity.this);
