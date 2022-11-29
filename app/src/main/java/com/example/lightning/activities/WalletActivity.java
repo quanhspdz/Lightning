@@ -1,18 +1,25 @@
 package com.example.lightning.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.lightning.R;
+import com.example.lightning.tools.Tool;
 
 public class WalletActivity extends AppCompatActivity {
 
-    RelativeLayout relativeAddMoney, relativeHistory;
+    RelativeLayout relativeAddMoney, relativeHistory, relativeShowAddMoney, relativeShowHistory;
     FrameLayout frameAddMoney, frameHistory;
+    EditText edtAmount;
+    AppCompatButton buttonOk, buttonConfirm;
+    TextView textFormattedMoney;
 
     boolean addMoneyIsChosen, historyIsChosen;
 
@@ -30,6 +37,12 @@ public class WalletActivity extends AppCompatActivity {
         relativeHistory = findViewById(R.id.relativeHistory);
         frameAddMoney = findViewById(R.id.frame_add_money_bot);
         frameHistory = findViewById(R.id.frame_history_bot);
+        edtAmount = findViewById(R.id.edt_money);
+        buttonOk = findViewById(R.id.buttonOk);
+        buttonConfirm = findViewById(R.id.buttonConfirm);
+        textFormattedMoney = findViewById(R.id.text_formatted_money);
+        relativeShowAddMoney = findViewById(R.id.relativeShowAddMoney);
+        relativeShowHistory = findViewById(R.id.relativeShowHistory);
 
         addMoneyIsChosen = true;
         historyIsChosen = false;
@@ -41,6 +54,8 @@ public class WalletActivity extends AppCompatActivity {
             public void onClick(View v) {
                 frameAddMoney.setVisibility(View.VISIBLE);
                 frameHistory.setVisibility(View.GONE);
+                relativeShowAddMoney.setVisibility(View.VISIBLE);
+                relativeShowHistory.setVisibility(View.GONE);
                 addMoneyIsChosen = true;
                 historyIsChosen = false;
             }
@@ -51,8 +66,19 @@ public class WalletActivity extends AppCompatActivity {
             public void onClick(View v) {
                 frameHistory.setVisibility(View.VISIBLE);
                 frameAddMoney.setVisibility(View.GONE);
+                relativeShowAddMoney.setVisibility(View.GONE);
+                relativeShowHistory.setVisibility(View.VISIBLE);
                 addMoneyIsChosen = false;
                 historyIsChosen = true;
+            }
+        });
+
+        buttonOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String amount = edtAmount.getText().toString().trim();
+                textFormattedMoney.setText(Tool.getCurrencyFormat(Double.parseDouble(amount)));
+                Tool.hideSoftKeyboard(WalletActivity.this);
             }
         });
     }

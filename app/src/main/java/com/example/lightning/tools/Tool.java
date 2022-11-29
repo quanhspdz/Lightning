@@ -6,6 +6,9 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class Tool {
     public static LatLng getLatLngFromString(String location) {
         LatLng latLng;
@@ -44,5 +47,11 @@ public class Tool {
                     0
             );
         }
+    }
+
+    public static String getCurrencyFormat(double money) {
+        NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("vi", "VN"));
+
+        return nf.format(money);
     }
 }
