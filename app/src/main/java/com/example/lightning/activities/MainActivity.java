@@ -32,7 +32,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity {
 
     EditText edtSearchPlace;
-    FrameLayout btnYourLocation, btnHistory, btnCar, btnMotor, btnVoucher, btnSettings;
+    FrameLayout btnYourLocation, btnHistory, btnCar, btnMotor, btnWallet, btnSettings;
     CircleImageView imageProfile;
 
     @Override
@@ -105,6 +105,14 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+        btnWallet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, WalletActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void init() {
@@ -113,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         btnHistory = findViewById(R.id.buttonHistory);
         btnCar = findViewById(R.id.buttonCar);
         btnMotor = findViewById(R.id.buttonMotor);
-        btnVoucher = findViewById(R.id.buttonVoucher);
+        btnWallet = findViewById(R.id.buttonWallet);
         btnSettings = findViewById(R.id.buttonSettings);
         imageProfile = findViewById(R.id.img_profile);
     }

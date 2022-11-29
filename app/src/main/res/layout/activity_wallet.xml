@@ -32,9 +32,9 @@
         android:layout_above="@id/layout_bottom"
         android:layout_centerInParent="true"
         android:layout_marginBottom="80dp"
-        android:text="22 000 đ"
+        android:text="0 đ"
         android:textColor="@color/white"
-        android:textSize="28sp"
+        android:textSize="30sp"
         android:textStyle="bold" />
 
     <TextView
@@ -44,8 +44,7 @@
         android:layout_above="@id/layout_bottom"
         android:layout_below="@id/text_money"
         android:layout_centerInParent="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="-70dp"
+        android:layout_marginTop="-75dp"
         android:text="Balance"
         android:textColor="@color/white"
         android:textSize="16sp" />
@@ -64,14 +63,14 @@
             android:layout_alignParentTop="true"
             android:layout_marginTop="30dp"
             android:layout_marginStart="100dp"
-            android:background="@drawable/button_background_green"
+            android:background="@drawable/button_background_grey_line"
             android:layout_alignParentStart="true">
 
             <ImageView
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
-                android:src="@drawable/add_wallet" />
+                android:src="@drawable/add_money" />
 
         </FrameLayout>
 
@@ -85,20 +84,20 @@
             android:layout_marginBottom="10dp" />
 
         <FrameLayout
+            android:id="@+id/button_history"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:id="@+id/button_history"
             android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="30dp"
             android:layout_marginEnd="100dp"
-            android:background="@drawable/button_background"
-            android:layout_alignParentEnd="true">
+            android:background="@drawable/button_background_grey_line">
 
             <ImageView
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_gravity="center"
-                android:src="@drawable/history_wallet" />
+                android:src="@drawable/transaction_history" />
 
         </FrameLayout>
 
