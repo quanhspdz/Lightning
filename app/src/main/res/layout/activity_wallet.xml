@@ -184,7 +184,7 @@
                 android:layout_height="45dp"
                 android:layout_marginTop="23dp"
                 android:layout_alignParentEnd="true"
-                android:background="@drawable/button_background_green"
+                android:background="@drawable/button_background"
                 android:text="ok"
                 android:id="@+id/buttonOk"
                 android:layout_alignParentTop="true"
@@ -201,21 +201,34 @@
                 android:text="Confirm"
                 android:id="@+id/buttonConfirm"
                 android:textColor="@color/white"
-                android:background="@drawable/button_background_green"/>
+                android:background="@drawable/button_background_grey_line"/>
 
 
-            <EditText
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Money"
                 android:textStyle="bold"
-                android:editable="false"
                 android:layout_below="@id/edt_money"
                 android:layout_centerHorizontal="true"
                 android:textSize="32sp"
+                android:visibility="gone"
                 android:layout_marginTop="60dp"
                 android:textColor="@color/primary_text"
                 android:id="@+id/text_formatted_money" />
+
+            <TextView
+                android:id="@+id/text_confirmation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@id/buttonConfirm"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginBottom="20dp"
+                android:text="Are you sure to add this amount of money to L-Wallet?"
+                android:textColor="@color/secondary_text"
+                android:textSize="18sp" />
 
         </RelativeLayout>
 

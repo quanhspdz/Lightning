@@ -3,6 +3,7 @@ package com.example.lightning.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -20,7 +21,7 @@ public class WalletActivity extends AppCompatActivity {
     FrameLayout frameAddMoney, frameHistory;
     EditText edtAmount;
     AppCompatButton buttonOk, buttonConfirm;
-    TextView textFormattedMoney;
+    TextView textFormattedMoney, textComfirmation;
 
     boolean addMoneyIsChosen, historyIsChosen;
 
@@ -44,6 +45,7 @@ public class WalletActivity extends AppCompatActivity {
         textFormattedMoney = findViewById(R.id.text_formatted_money);
         relativeShowAddMoney = findViewById(R.id.relativeShowAddMoney);
         relativeShowHistory = findViewById(R.id.relativeShowHistory);
+        textComfirmation = findViewById(R.id.text_confirmation);
 
         addMoneyIsChosen = true;
         historyIsChosen = false;
@@ -59,6 +61,8 @@ public class WalletActivity extends AppCompatActivity {
                 relativeShowHistory.setVisibility(View.GONE);
                 edtAmount.setText("");
                 textFormattedMoney.setText("");
+                textComfirmation.setVisibility(View.GONE);
+                buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
                 addMoneyIsChosen = true;
                 historyIsChosen = false;
             }
@@ -73,6 +77,8 @@ public class WalletActivity extends AppCompatActivity {
                 relativeShowHistory.setVisibility(View.VISIBLE);
                 edtAmount.setText("");
                 textFormattedMoney.setText("");
+                textComfirmation.setVisibility(View.GONE);
+                buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
                 addMoneyIsChosen = false;
                 historyIsChosen = true;
             }
@@ -83,6 +89,9 @@ public class WalletActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String amount = edtAmount.getText().toString().trim();
                 if (!amount.isEmpty()) {
+                    textFormattedMoney.setVisibility(View.VISIBLE);
+                    textComfirmation.setVisibility(View.VISIBLE);
+                    buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background));
                     textFormattedMoney.setText(Tool.getCurrencyFormat(Double.parseDouble(amount)));
                     Tool.hideSoftKeyboard(WalletActivity.this);
                 } else {
