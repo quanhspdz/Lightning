@@ -1,20 +1,38 @@
 package com.example.lightning.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.lightning.R;
+import com.example.lightning.models.Transaction;
+import com.example.lightning.tools.Const;
 import com.example.lightning.tools.Tool;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
 
 public class WalletActivity extends AppCompatActivity {
 
@@ -23,7 +41,9 @@ public class WalletActivity extends AppCompatActivity {
     FrameLayout frameAddMoney, frameHistory;
     EditText edtAmount;
     AppCompatButton buttonOk, buttonConfirm;
-    TextView textFormattedMoney, textConfirmation, textAddMoney, textHistory;
+    TextView textFormattedMoney, textConfirmation, textAddMoney, textHistory, textBalance;
+
+    ProgressDialog progressDialog;
 
     boolean addMoneyIsChosen, historyIsChosen;
 
@@ -34,6 +54,7 @@ public class WalletActivity extends AppCompatActivity {
 
         init();
         listener();
+        calculateBalance();
     }
 
     private void init() {
@@ -51,51 +72,26 @@ public class WalletActivity extends AppCompatActivity {
         textAddMoney = findViewById(R.id.text_addMoney);
         textHistory = findViewById(R.id.text_history);
         relativeBack = findViewById(R.id.relative_back);
+        textBalance = findViewById(R.id.text_money);
 
         addMoneyIsChosen = true;
         historyIsChosen = false;
+
+        progressDialog = new ProgressDialog(this);
     }
 
     private void listener() {
         relativeAddMoney.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                frameAddMoney.setVisibility(View.VISIBLE);
-                frameHistory.setVisibility(View.GONE);
-                relativeShowAddMoney.setVisibility(View.VISIBLE);
-                relativeShowHistory.setVisibility(View.GONE);
-                edtAmount.setText("");
-                textFormattedMoney.setText("");
-                textConfirmation.setVisibility(View.GONE);
-                buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
-                addMoneyIsChosen = true;
-                historyIsChosen = false;
-
-                textAddMoney.setTypeface(null, Typeface.BOLD);
-                textAddMoney.setTextColor(getResources().getColor(R.color.primary_text));
-                textHistory.setTypeface(null, Typeface.NORMAL);
-                textHistory.setTextColor(getResources().getColor(R.color.secondary_text));
+                clearAddMoney();
             }
         });
 
         relativeHistory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                frameHistory.setVisibility(View.VISIBLE);
-                frameAddMoney.setVisibility(View.GONE);
-                relativeShowAddMoney.setVisibility(View.GONE);
-                relativeShowHistory.setVisibility(View.VISIBLE);
-                edtAmount.setText("");
-                textFormattedMoney.setText("");
-                textConfirmation.setVisibility(View.GONE);
-                buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
-                addMoneyIsChosen = false;
-                historyIsChosen = true;
-
-                textHistory.setTypeface(null, Typeface.BOLD);
-                textHistory.setTextColor(getResources().getColor(R.color.primary_text));
-                textAddMoney.setTypeface(null, Typeface.NORMAL);
-                textAddMoney.setTextColor(getResources().getColor(R.color.secondary_text));
+                clearHistory();
             }
         });
 
@@ -121,5 +117,148 @@ public class WalletActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+        buttonConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addMoneyToWallet();
+            }
+        });
+    }
+
+    private void addMoneyToWallet() {
+        if (addMoneyIsChosen) {
+            progressDialog.setMessage("Loading...");
+            progressDialog.show();
+            String amount = textFormattedMoney.getText().toString();
+            if (!amount.isEmpty()) {
+                String senderId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("L-Wallet")
+                        .child("Transactions");
+                String transId = databaseReference.push().getKey();
+
+                Transaction transaction = new Transaction(
+                        transId,
+                        senderId,
+                        null,
+                        amount,
+                        Calendar.getInstance().getTime().toString(),
+                        Const.addMoney);
+
+                assert transId != null;
+                FirebaseDatabase.getInstance().getReference().child("L-Wallet")
+                        .child("Transactions")
+                        .child(transId)
+                        .setValue(transaction)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                progressDialog.dismiss();
+                                Toast.makeText(WalletActivity.this, "Successful!", Toast.LENGTH_SHORT).show();
+                                clearAddMoney();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                progressDialog.dismiss();
+                                Toast.makeText(WalletActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
+        }
+    }
+
+    private void clearAddMoney() {
+        frameAddMoney.setVisibility(View.VISIBLE);
+        frameHistory.setVisibility(View.GONE);
+        relativeShowAddMoney.setVisibility(View.VISIBLE);
+        relativeShowHistory.setVisibility(View.GONE);
+        edtAmount.setText("");
+        textFormattedMoney.setText("");
+        textConfirmation.setVisibility(View.GONE);
+        buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
+        addMoneyIsChosen = true;
+        historyIsChosen = false;
+
+        textAddMoney.setTypeface(null, Typeface.BOLD);
+        textAddMoney.setTextColor(getResources().getColor(R.color.primary_text));
+        textHistory.setTypeface(null, Typeface.NORMAL);
+        textHistory.setTextColor(getResources().getColor(R.color.secondary_text));
+    }
+
+    private void clearHistory() {
+        frameHistory.setVisibility(View.VISIBLE);
+        frameAddMoney.setVisibility(View.GONE);
+        relativeShowAddMoney.setVisibility(View.GONE);
+        relativeShowHistory.setVisibility(View.VISIBLE);
+        edtAmount.setText("");
+        textFormattedMoney.setText("");
+        textConfirmation.setVisibility(View.GONE);
+        buttonConfirm.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
+        addMoneyIsChosen = false;
+        historyIsChosen = true;
+
+        textHistory.setTypeface(null, Typeface.BOLD);
+        textHistory.setTextColor(getResources().getColor(R.color.primary_text));
+        textAddMoney.setTypeface(null, Typeface.NORMAL);
+        textAddMoney.setTextColor(getResources().getColor(R.color.secondary_text));
+    }
+
+    private void calculateBalance() {
+        List<Transaction> listReceiveTrans  = new ArrayList<>();
+        List<Transaction> listSendTrans = new ArrayList<>();
+
+        FirebaseDatabase.getInstance().getReference().child("L-Wallet")
+                .child("Transactions")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        listReceiveTrans.clear();
+                        listSendTrans.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Transaction transaction = dataSnapshot.getValue(Transaction.class);
+                            String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                            if (transaction != null) {
+                                if (transaction.getNote().equals(Const.addMoney)) {
+                                    listReceiveTrans.add(transaction);
+                                } else if (transaction.getSenderId().equals(userId)) {
+                                    listSendTrans.add(transaction);
+                                } else if (transaction.getReceiverId().equals(userId)) {
+                                    listReceiveTrans.add(transaction);
+                                }
+                            }
+                        }
+
+                        String totalBalance = getTotalBalance(listReceiveTrans, listSendTrans);
+                        textBalance.setText(totalBalance);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private String getTotalBalance(List<Transaction> listReceiveTrans, List<Transaction> listSendTrans) {
+        double totalBalance = 0;
+        double totalSendMoney = 0;
+        double totalReceivedMoney = 0;
+
+        for (int i = 0; i < listReceiveTrans.size(); i ++) {
+            double money = Tool.getDoubleFromFormattedMoney(listReceiveTrans.get(i).getAmount());
+            totalReceivedMoney += money;
+        }
+
+        for (int i = 0; i < listSendTrans.size(); i ++) {
+            double money = Tool.getDoubleFromFormattedMoney(listSendTrans.get(i).getAmount());
+            totalSendMoney += money;
+        }
+
+        totalBalance = totalReceivedMoney - totalSendMoney;
+
+        return Tool.getCurrencyFormat(totalBalance);
     }
 }

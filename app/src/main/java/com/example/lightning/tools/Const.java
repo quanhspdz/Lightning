@@ -20,4 +20,6 @@ public class Const {
 
     public static final String active = "active";
     public static final String finished = "finished";
+
+    public static final String addMoney = "addMoneyToWallet";
 }

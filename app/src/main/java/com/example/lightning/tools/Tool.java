@@ -54,4 +54,14 @@ public class Tool {
 
         return nf.format(money);
     }
+
+    public static double getDoubleFromFormattedMoney(String strMoney) {
+        String tempStr = strMoney.substring(0, strMoney.indexOf("₫") - 1);
+        tempStr = tempStr.replaceAll("\\.", "");
+        tempStr = tempStr.replaceAll(",", ".");
+        tempStr = tempStr.trim();
+        double money = Double.parseDouble(tempStr);
+
+        return money;
+    }
 }
