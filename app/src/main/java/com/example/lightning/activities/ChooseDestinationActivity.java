@@ -96,7 +96,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     LinearLayout layoutBottom;
     FloatingActionButton btnSearchPickUp, btnSearchDes;
     TextView textTimeMotor, textTimeCar, textCostMotor, textCostCar;
-    RelativeLayout layoutMotor, layoutCar;
+    RelativeLayout layoutMotor, layoutCar, layoutCash, layoutOnline;
 
     private static final Integer CHOOSE_DES_REQUEST_CODE = 1;
     private static final Integer CHOOSE_PICK_UP_REQUEST_CODE = 2;
@@ -125,6 +125,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     boolean gotListPlaces = false;
 
     boolean pickUpIsChosen = false, destIsChosen = false;
+
+    String paymentMethod;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -216,7 +218,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                         Toast.makeText(ChooseDestinationActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
-                if ((carIsChosen || motorIsChosen) && checkTripData()) {
+                if ((carIsChosen || motorIsChosen) && checkTripData() && paymentMethod != null) {
                     if (carIsChosen) {
                         trip = new Trip(
                                 FirebaseAuth.getInstance().getUid(),
@@ -226,6 +228,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                                 moneyCostCar,
                                 timeCost,
                                 Const.car,
+                                paymentMethod,
                                 Calendar.getInstance().getTime().toString()
                         );
                     } else if (motorIsChosen) {
@@ -237,6 +240,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                                 moneyCostMotor,
                                 timeCost,
                                 Const.motor,
+                                paymentMethod,
                                 Calendar.getInstance().getTime().toString()
                         );
                     }
@@ -265,6 +269,24 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
                 motorIsChosen = false;
                 carIsChosen = true;
+            }
+        });
+
+        layoutCash.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutCash.setBackgroundColor(getResources().getColor(R.color.selected_payment));
+                layoutOnline.setBackgroundColor(getResources().getColor(R.color.white));
+                paymentMethod = Const.cash;
+            }
+        });
+
+        layoutOnline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layoutOnline.setBackgroundColor(getResources().getColor(R.color.selected_payment));
+                layoutCash.setBackgroundColor(getResources().getColor(R.color.white));
+                paymentMethod = Const.online;
             }
         });
 
@@ -346,6 +368,8 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         textTimeMotor = findViewById(R.id.text_time_motor);
         layoutCar = findViewById(R.id.layoutCar);
         layoutMotor = findViewById(R.id.layoutMotor);
+        layoutCash = findViewById(R.id.layoutCash);
+        layoutOnline = findViewById(R.id.layout_online);
 
         recyclerViewPickUp = findViewById(R.id.recyclerView_pickUp);
         recyclerViewDropOff = findViewById(R.id.recyclerView_dropOff);

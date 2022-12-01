@@ -110,17 +110,78 @@
     <LinearLayout
         android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="300dp"
         android:layout_above="@id/buttonConfirm"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="10dp"
         android:orientation="vertical"
         android:visibility="gone"
-        android:weightSum="2">
+        android:weightSum="4">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layoutCash"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/dollar"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:id="@+id/imgCash"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_toEndOf="@id/imgCash"
+                android:text="Cash"
+                android:layout_centerVertical="true"
+                android:id="@+id/text_cash"
+                android:layout_marginVertical="10dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layout_online"
+            android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/l_wallet"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="20dp"
+                android:id="@+id/imgOnline"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_toEndOf="@id/imgOnline"
+                android:text="L-Wallet"
+                android:layout_centerVertical="true"
+                android:id="@+id/text_online"
+                android:layout_marginVertical="10dp"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/layoutMotor"
+            android:layout_marginTop="10dp"
             android:layout_weight="1">
 
             <ImageView
@@ -171,6 +232,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/layoutCar"
+            android:layout_marginTop="10dp"
             android:layout_weight="1">
 
             <ImageView

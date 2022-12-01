@@ -46,6 +46,18 @@ public class Trip {
         this.createTime = createTime;
     }
 
+    public Trip(String passengerId, String pickUpLocation, String dropOffLocation, String distance, String cost, String timeCost, String vehicleType, String paymentMethod, String createTime) {
+        this.passengerId = passengerId;
+        this.pickUpLocation = pickUpLocation;
+        this.dropOffLocation = dropOffLocation;
+        this.distance = distance;
+        this.cost = cost;
+        this.timeCost = timeCost;
+        this.vehicleType = vehicleType;
+        this.paymentMethod = paymentMethod;
+        this.createTime = createTime;
+    }
+
     public Trip() {
     }
 
