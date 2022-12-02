@@ -123,6 +123,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     private final int SMS_REQUEST_CODE = 234;
 
     boolean movedToSearching = false;
+    boolean passengerArrivedToDropOff = false, cancelable = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -418,10 +419,19 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             textStatus.setText("Going to your destination");
             textTimeLeft.setVisibility(View.GONE);
             textDistanceLeft.setVisibility(View.GONE);
+
+            btnCancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
+            btnCancel.setText("Pay for driver");
+            cancelable = false;
         } else if (trip.getStatus().equals(Const.arrivedDropOff)) {
             textStatus.setText("You have arrived to your destination");
             textTimeLeft.setVisibility(View.GONE);
             textDistanceLeft.setVisibility(View.GONE);
+
+            btnCancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background));
+            btnCancel.setText("Pay for driver");
+            cancelable = false;
+            passengerArrivedToDropOff = true;
         } else if (trip.getStatus().equals(Const.waitingPickUp)) {
             textStatus.setText("Driver is coming in ");
             textTimeLeft.setVisibility(View.VISIBLE);
@@ -527,9 +537,20 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         btnCancel.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                cancelTrip();
+                if (cancelable) {
+                    cancelTrip();
+                }
 
                 return false;
+            }
+        });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (passengerArrivedToDropOff) {
+
+                }
             }
         });
     }
