@@ -1,20 +1,18 @@
 package com.example.lightning.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.lightning.R;
 import com.example.lightning.models.Transaction;
@@ -221,12 +219,13 @@ public class WalletActivity extends AppCompatActivity {
                             Transaction transaction = dataSnapshot.getValue(Transaction.class);
                             String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
                             if (transaction != null) {
-                                if (transaction.getNote().equals(Const.addMoney)) {
+                                if (transaction.getNote().equals(Const.addMoney) && transaction.getSenderId().equals(userId)) {
                                     listReceiveTrans.add(transaction);
                                 } else if (transaction.getSenderId().equals(userId)) {
                                     listSendTrans.add(transaction);
-                                } else if (transaction.getReceiverId().equals(userId)) {
-                                    listReceiveTrans.add(transaction);
+                                } else if (transaction.getReceiverId() != null) {
+                                    if (transaction.getReceiverId().equals(userId))
+                                        listReceiveTrans.add(transaction);
                                 }
                             }
                         }
