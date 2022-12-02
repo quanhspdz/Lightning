@@ -402,6 +402,14 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         edtPickUp.setText(trip.getPickUpName());
         edtDropOff.setText(trip.getDropOffName());
 
+        if (trip.getPaymentMethod() != null) {
+            if (trip.getPaymentMethod().equals(Const.cash)) {
+                textPaymentMethod.setText("Cash");
+            } else if (trip.getPaymentMethod().equals(Const.online)){
+                textPaymentMethod.setText("L-Wallet");
+            }
+        }
+
         if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
             textStatus.setText("Driver has arrived to pick-up point");
             textTimeLeft.setVisibility(View.GONE);
