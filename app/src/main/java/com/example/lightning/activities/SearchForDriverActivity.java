@@ -208,7 +208,8 @@ public class SearchForDriverActivity extends AppCompatActivity implements OnMapR
                             if (trip != null)
                                 if (trip.getPassengerId().equals(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())) {
                                     if (!trip.getStatus().equals(Const.cancelByPassenger)
-                                        && !trip.getStatus().equals(Const.cancelByDriver)) {
+                                        && !trip.getStatus().equals(Const.cancelByDriver)
+                                        && !trip.getStatus().equals(Const.success)) {
                                         listTrips.add(trip);
                                     }
                                 }

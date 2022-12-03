@@ -87,6 +87,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     AppCompatButton btnCancel;
     CircleImageView buttonFocus;
     EditText edtPickUp, edtDropOff;
+    public static ProgressDialog transferProgressDialog;
 
     boolean infoIsHided = true;
 
@@ -129,7 +130,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     private final int CALL_REQUEST_CODE = 123;
     private final int SMS_REQUEST_CODE = 234;
 
-    boolean movedToSearching = false;
+    boolean movedToSearching = false, movedToReview = false;
     boolean passengerArrivedToDropOff = false, cancelable = true, onlinePayment = false;
     static String currentWalletBalance;
 
@@ -451,9 +452,11 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             textTimeLeft.setVisibility(View.VISIBLE);
             textDistanceLeft.setVisibility(View.VISIBLE);
             return;
-        } else if (trip.getStatus().equals(Const.success)) {
+        } else if (trip.getStatus().equals(Const.success) && !movedToReview) {
+            movedToReview = true;
             Intent intent = new Intent(WaitingPickUp.this, ReviewTrip.class);
             Toast.makeText(this, "Done!", Toast.LENGTH_SHORT).show();
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
             finish();
         } else if (trip.getStatus().equals(Const.cancelByDriver) && !movedToSearching) {
@@ -569,13 +572,25 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         Toast.makeText(WaitingPickUp.this, "Your L-Wallet balance smaller than this trip's cost!", Toast.LENGTH_SHORT).show();
                     }
                 }
+                if (!onlinePayment) {
+                    btnCancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
+                    btnCancel.setClickable(false);
+                    Toast.makeText(WaitingPickUp.this, "Successful!", Toast.LENGTH_SHORT).show();
+
+                    trip.setStatus(Const.paymentSuccessful);
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("Trips")
+                            .child(trip.getId())
+                            .setValue(trip);
+                }
             }
         });
     }
 
     private void transferMoney(String receiverId, String amount) {
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
+        transferProgressDialog = new ProgressDialog(this);
+        transferProgressDialog.setMessage("Loading...");
+        transferProgressDialog.show();
 
         String senderId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
 
@@ -601,7 +616,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                     public void onSuccess(Void unused) {
                         btnCancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
                         btnCancel.setClickable(false);
-                        progressDialog.dismiss();
+                        transferProgressDialog.dismiss();
                         Toast.makeText(WaitingPickUp.this, "Successful!", Toast.LENGTH_SHORT).show();
 
                         trip.setStatus(Const.paymentSuccessful);
@@ -614,7 +629,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
+                        transferProgressDialog.dismiss();
                         Toast.makeText(WaitingPickUp.this, "Error!", Toast.LENGTH_SHORT).show();
                     }
                 });
