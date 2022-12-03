@@ -421,7 +421,11 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
             }
         }
 
-        if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
+        if (trip.getStatus().equals(Const.paymentSuccessful)) {
+            textStatus.setText("Payment successfully done!");
+            btnCancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
+            btnCancel.setClickable(false);
+        } else if (trip.getStatus().equals(Const.driverArrivedPickUp)) {
             textStatus.setText("Driver has arrived to pick-up point");
             textTimeLeft.setVisibility(View.GONE);
             textDistanceLeft.setVisibility(View.GONE);
@@ -561,6 +565,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 if (passengerArrivedToDropOff && onlinePayment && currentWalletBalance != null) {
                     if (checkWalletBalance(currentWalletBalance, trip.getCost())) {
                         transferMoney(driver.getId(), trip.getCost());
+                    } else {
+                        Toast.makeText(WaitingPickUp.this, "Your L-Wallet balance smaller than this trip's cost!", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -597,6 +603,12 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         btnCancel.setClickable(false);
                         progressDialog.dismiss();
                         Toast.makeText(WaitingPickUp.this, "Successful!", Toast.LENGTH_SHORT).show();
+
+                        trip.setStatus(Const.paymentSuccessful);
+                        FirebaseDatabase.getInstance().getReference()
+                                .child("Trips")
+                                .child(trip.getId())
+                                .setValue(trip);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
