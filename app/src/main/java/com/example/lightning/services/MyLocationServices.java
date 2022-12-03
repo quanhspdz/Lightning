@@ -7,6 +7,7 @@ import static com.example.lightning.activities.SearchForDriverActivity.markerIco
 import static com.example.lightning.activities.SearchForDriverActivity.radarCircle;
 import static com.example.lightning.activities.SearchForDriverActivity.trip;
 import static com.example.lightning.activities.SearchForDriverActivity.userIconSize;
+import static com.example.lightning.activities.WalletActivity.getTotalBalance;
 
 import android.Manifest;
 import android.animation.IntEvaluator;
@@ -36,6 +37,7 @@ import androidx.core.app.NotificationCompat;
 import com.example.lightning.R;
 import com.example.lightning.activities.SearchForDriverActivity;
 import com.example.lightning.activities.WaitingPickUp;
+import com.example.lightning.models.Transaction;
 import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -57,6 +59,7 @@ import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 public class MyLocationServices extends Service {

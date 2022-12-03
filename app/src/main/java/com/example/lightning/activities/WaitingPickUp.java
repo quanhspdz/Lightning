@@ -1,5 +1,7 @@
 package com.example.lightning.activities;
 
+import static com.example.lightning.activities.WalletActivity.getTotalBalance;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
@@ -33,6 +35,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
 import com.example.lightning.models.CurrentPosition;
 import com.example.lightning.models.Driver;
+import com.example.lightning.models.Transaction;
 import com.example.lightning.models.Trip;
 import com.example.lightning.models.Vehicle;
 import com.example.lightning.services.MyLocationServices;
@@ -53,8 +56,10 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.PolyUtil;
@@ -66,7 +71,9 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -123,7 +130,8 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
     private final int SMS_REQUEST_CODE = 234;
 
     boolean movedToSearching = false;
-    boolean passengerArrivedToDropOff = false, cancelable = true;
+    boolean passengerArrivedToDropOff = false, cancelable = true, onlinePayment = false;
+    static String currentWalletBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +142,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         loadCurrentApiKey();
         hideInfo();
         listener();
+        calculateLastBalance();
     }
 
     public void zoomToDriver() {
@@ -408,6 +417,7 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                 textPaymentMethod.setText("Cash");
             } else if (trip.getPaymentMethod().equals(Const.online)){
                 textPaymentMethod.setText("L-Wallet");
+                onlinePayment = true;
             }
         }
 
@@ -548,11 +558,60 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (passengerArrivedToDropOff) {
-
+                if (passengerArrivedToDropOff && onlinePayment && currentWalletBalance != null) {
+                    if (checkWalletBalance(currentWalletBalance, trip.getCost())) {
+                        transferMoney(driver.getId(), trip.getCost());
+                    }
                 }
             }
         });
+    }
+
+    private void transferMoney(String receiverId, String amount) {
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+
+        String senderId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("L-Wallet")
+                .child("Transactions");
+        String transId = databaseReference.push().getKey();
+
+        Transaction transaction = new Transaction(
+                transId,
+                senderId,
+                receiverId,
+                amount,
+                Calendar.getInstance().getTime().toString(),
+                Const.payForDriver);
+
+        assert transId != null;
+        FirebaseDatabase.getInstance().getReference().child("L-Wallet")
+                .child("Transactions")
+                .child(transId)
+                .setValue(transaction)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        btnCancel.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_grey_line));
+                        btnCancel.setClickable(false);
+                        progressDialog.dismiss();
+                        Toast.makeText(WaitingPickUp.this, "Successful!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(WaitingPickUp.this, "Error!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private boolean checkWalletBalance(String currentWalletBalance, String amount) {
+
+        return Tool.getDoubleFromFormattedMoney(currentWalletBalance) >= Tool.getDoubleFromFormattedMoney(amount);
     }
 
     private void hideInfo() {
@@ -756,6 +815,42 @@ public class WaitingPickUp extends AppCompatActivity implements OnMapReadyCallba
                         }
                     });
         }
+    }
+
+    public void calculateLastBalance() {
+        List<Transaction> listReceiveTrans = new ArrayList<>();
+        List<Transaction> listSendTrans = new ArrayList<>();
+
+        FirebaseDatabase.getInstance().getReference().child("L-Wallet")
+                .child("Transactions")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        listReceiveTrans.clear();
+                        listSendTrans.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Transaction transaction = dataSnapshot.getValue(Transaction.class);
+                            String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                            if (transaction != null) {
+                                if (transaction.getNote().equals(Const.addMoney) && transaction.getSenderId().equals(userId)) {
+                                    listReceiveTrans.add(transaction);
+                                } else if (transaction.getSenderId().equals(userId)) {
+                                    listSendTrans.add(transaction);
+                                } else if (transaction.getReceiverId() != null) {
+                                    if (transaction.getReceiverId().equals(userId))
+                                        listReceiveTrans.add(transaction);
+                                }
+                            }
+                        }
+
+                        currentWalletBalance = getTotalBalance(listReceiveTrans, listSendTrans);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
     }
 
     @Override

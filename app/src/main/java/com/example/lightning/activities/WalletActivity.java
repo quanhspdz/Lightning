@@ -241,7 +241,7 @@ public class WalletActivity extends AppCompatActivity {
                 });
     }
 
-    private String getTotalBalance(List<Transaction> listReceiveTrans, List<Transaction> listSendTrans) {
+    public static String getTotalBalance(List<Transaction> listReceiveTrans, List<Transaction> listSendTrans) {
         double totalBalance = 0;
         double totalSendMoney = 0;
         double totalReceivedMoney = 0;

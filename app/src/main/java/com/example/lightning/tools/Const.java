@@ -17,11 +17,13 @@ public class Const {
     public static final String cancelByPassenger = "canceledByPassenger";
     public static final String cancelByDriver = "canceledByDriver";
     public static final String success = "success";
+    public static final String paymentSuccessful = "paymentSuccessful";
 
     public static final String active = "active";
     public static final String finished = "finished";
 
     public static final String addMoney = "addMoneyToWallet";
+    public static final String payForDriver = "payForDriver";
 
     public static final String cash = "cash";
     public static final String online = "online";
