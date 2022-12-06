@@ -2,6 +2,8 @@ package com.example.lightning.activities;
 
 import static android.content.ContentValues.TAG;
 
+import static com.example.lightning.activities.WalletActivity.getTotalBalance;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -43,6 +45,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.lightning.R;
 import com.example.lightning.adapters.PlaceAdapter;
 import com.example.lightning.interfaces.OnItemClickListener;
+import com.example.lightning.models.Transaction;
 import com.example.lightning.models.Trip;
 import com.example.lightning.tools.Const;
 import com.example.lightning.tools.Goong;
@@ -88,6 +91,7 @@ import java.util.Calendar;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ChooseDestinationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -127,6 +131,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
     boolean pickUpIsChosen = false, destIsChosen = false;
 
     String paymentMethod;
+    String currentWalletBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,7 +142,7 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         init();
         setStatusBarColor();
         listener();
-
+        calculateLastBalance();
     }
 
     private void loadCurrentApiKey() {
@@ -255,20 +260,40 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
         layoutMotor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layoutMotor.setBackgroundColor(getResources().getColor(R.color.selected_blue));
-                layoutCar.setBackgroundColor(getResources().getColor(R.color.white));
-                motorIsChosen = true;
-                carIsChosen = false;
+                if (paymentMethod != null) {
+                    if (paymentMethod.equals(Const.online)) {
+                        if (currentWalletBalance != null) {
+                            if (checkWalletBalance(currentWalletBalance, moneyCostCar)) {
+                                layoutMotor.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                                layoutCar.setBackgroundColor(getResources().getColor(R.color.white));
+                                motorIsChosen = true;
+                                carIsChosen = false;
+                            } else {
+                                Toast.makeText(ChooseDestinationActivity.this, "Your L-Wallet balance smaller than this trip's cost!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
             }
         });
 
         layoutCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                layoutMotor.setBackgroundColor(getResources().getColor(R.color.white));
-                layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
-                motorIsChosen = false;
-                carIsChosen = true;
+                if (paymentMethod != null) {
+                    if (paymentMethod.equals(Const.online)) {
+                        if (currentWalletBalance != null) {
+                            if (checkWalletBalance(currentWalletBalance, moneyCostCar)) {
+                                layoutMotor.setBackgroundColor(getResources().getColor(R.color.white));
+                                layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                                motorIsChosen = false;
+                                carIsChosen = true;
+                            } else {
+                                Toast.makeText(ChooseDestinationActivity.this, "Your L-Wallet balance smaller than this trip's cost!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
             }
         });
 
@@ -616,6 +641,47 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                 carIsChosen = true;
             }
         }
+    }
+
+    public void calculateLastBalance() {
+        List<Transaction> listReceiveTrans = new ArrayList<>();
+        List<Transaction> listSendTrans = new ArrayList<>();
+
+        FirebaseDatabase.getInstance().getReference().child("L-Wallet")
+                .child("Transactions")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        listReceiveTrans.clear();
+                        listSendTrans.clear();
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Transaction transaction = dataSnapshot.getValue(Transaction.class);
+                            String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+                            if (transaction != null) {
+                                if (transaction.getNote().equals(Const.addMoney) && transaction.getSenderId().equals(userId)) {
+                                    listReceiveTrans.add(transaction);
+                                } else if (transaction.getSenderId().equals(userId)) {
+                                    listSendTrans.add(transaction);
+                                } else if (transaction.getReceiverId() != null) {
+                                    if (transaction.getReceiverId().equals(userId))
+                                        listReceiveTrans.add(transaction);
+                                }
+                            }
+                        }
+
+                        currentWalletBalance = getTotalBalance(listReceiveTrans, listSendTrans);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+    }
+
+    private boolean checkWalletBalance(String currentWalletBalance, String amount) {
+
+        return Tool.getDoubleFromFormattedMoney(currentWalletBalance) >= Tool.getDoubleFromFormattedMoney(amount);
     }
 
     @Override
