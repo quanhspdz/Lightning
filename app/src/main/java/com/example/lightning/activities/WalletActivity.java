@@ -86,6 +86,8 @@ public class WalletActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setReverseLayout(true);
         recyclerTransHistory.setHasFixedSize(true);
         recyclerTransHistory.setLayoutManager(linearLayoutManager);
 
