@@ -55,7 +55,7 @@
         android:background="@drawable/circle_image_background"
         android:layout_below="@id/toolBar"
         android:layout_marginTop="30dp"
-        android:layout_centerHorizontal="true"
+        android:layout_marginStart="30dp"
         android:src="@drawable/user_blue"
         android:id="@+id/img_profile"/>
 
@@ -63,12 +63,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Nguyen Van A"
-        android:layout_below="@id/img_profile"
-        android:layout_centerHorizontal="true"
+        android:layout_below="@id/toolBar"
+        android:layout_toEndOf="@id/img_profile"
         android:textStyle="bold"
         android:textSize="22sp"
+        android:layout_marginStart="20dp"
         android:textColor="@color/white"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="60dp"
         android:id="@+id/text_userName"/>
 
     <RelativeLayout
