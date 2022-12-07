@@ -49,12 +49,12 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:background="@drawable/circle_image_background"
         android:layout_below="@id/toolBar"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/user_blue"
         android:id="@+id/img_profile"/>
