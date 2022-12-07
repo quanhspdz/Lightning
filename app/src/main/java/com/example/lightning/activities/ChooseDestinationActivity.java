@@ -272,6 +272,11 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                                 Toast.makeText(ChooseDestinationActivity.this, "Your L-Wallet balance smaller than this trip's cost!", Toast.LENGTH_SHORT).show();
                             }
                         }
+                    } else {
+                        layoutMotor.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                        layoutCar.setBackgroundColor(getResources().getColor(R.color.white));
+                        motorIsChosen = true;
+                        carIsChosen = false;
                     }
                 }
             }
@@ -292,6 +297,11 @@ public class ChooseDestinationActivity extends AppCompatActivity implements OnMa
                                 Toast.makeText(ChooseDestinationActivity.this, "Your L-Wallet balance smaller than this trip's cost!", Toast.LENGTH_SHORT).show();
                             }
                         }
+                    } else {
+                        layoutMotor.setBackgroundColor(getResources().getColor(R.color.white));
+                        layoutCar.setBackgroundColor(getResources().getColor(R.color.selected_blue));
+                        motorIsChosen = false;
+                        carIsChosen = true;
                     }
                 }
             }
