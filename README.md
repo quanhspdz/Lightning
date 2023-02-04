@@ -6,6 +6,8 @@ Lightning gồm các tính năng chính như:
   - Hiển thị thông tin của tài xế, phương tiện. Cập nhật vị trí, hướng đi, vận tốc của tài xế theo thời gian thực
   - Thanh toán Online (đang phát triển)
   
+File cài đặt (APK): https://drive.google.com/file/d/1cQ2tKWmEawfQGCoLMdV14US3X1wXigtw/view
+  
 Ảnh chụp màn hình ứng dụng:
 - Màn hình chính:
 <img src="https://user-images.githubusercontent.com/81352730/216761545-37f37dcb-c0ef-4726-a32c-44734cbafdcb.png" width="300" height="600">
